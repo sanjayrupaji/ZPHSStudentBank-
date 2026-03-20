@@ -101,6 +101,11 @@ public class MainActivity extends AppCompatActivity {
             settings.setAllowUniversalAccessFromFileURLs(true);
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+}
+webView.setWebViewClient(new WebViewClient());
+webView.setWebChromeClient(new WebChromeClient());
         // Zoom
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
