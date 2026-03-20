@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Caching
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setAppCacheEnabled(true);
+        
 
         // Text size
         settings.setTextZoom(100);
