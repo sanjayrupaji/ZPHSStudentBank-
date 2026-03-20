@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ZPHS Student Bank 2024-25</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --saffron: #e8690a;
+  --saffron-light: #ff8c2a;
+  --saffron-pale: #fff3e8;
+  --navy: #0a1f44;
+  --navy-mid: #1a3a6b;
+  --navy-light: #2a5298;
+  --sky: #e8f4ff;
+  --green: #1a7a3a;
+  --green-light: #e6f7ed;
+  --red: #c0392b;
+  --red-light: #fdecea;
+  --gold: #f5a623;
+  --cream: #fef9f4;
+  --cream2: #f5ede0;
+  --border: #e0d0bf;
+  --text: #1a1a2e;
+  --text2: #5a5a7a;
+  --white: #ffffff;
+  --shadow: 0 2px 16px rgba(10,31,68,0.10);
+  --shadow-lg: 0 8px 40px rgba(10,31,68,0.18);
+  --r: 14px;
+  --r-lg: 20px;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  height:100%; 
+  font-family: 'Noto Sans Devanagari', 'Baloo 2', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  overscroll-behavior: none;
+}
+body {
+  display:flex; flex-direction:column;
+  max-width:480px; margin:0 auto; min-height:100vh;
+  box-shadow: 0 0 60px rgba(0,0,0,0.12);
+  background: var(--cream);
+  position:relative;
+}
+
+/* ========= TOPBAR ========= */
+.topbar {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+  color:#fff; padding:12px 16px; 
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:200;
+  border-bottom: 3px solid var(--saffron);
+}
+.topbar-brand { display:flex; align-items:center; gap:10px; }
+.topbar-flag { font-size:1.4rem; }
+.topbar-title { font-family:'Baloo 2', sans-serif; font-size:1.1rem; font-weight:800; line-height:1.1; }
+.topbar-title span { color:var(--saffron-light); }
+.topbar-sub { font-size:0.6rem; opacity:0.75; letter-spacing:0.05em; text-transform:uppercase; }
+.topbar-back { background:rgba(255,255,255,0.15); border:none; color:#fff; width:36px; height:36px; border-radius:10px; cursor:pointer; font-size:1.3rem; display:none; align-items:center; justify-content:center; transition:background 0.2s; }
+.topbar-back:hover { background:rgba(255,255,255,0.25); }
+.topbar-back.show { display:flex; }
+.topbar-icons { display:flex; gap:6px; }
+.icon-btn { background:rgba(255,255,255,0.12); border:none; color:#fff; width:36px; height:36px; border-radius:10px; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; transition:background 0.2s; }
+.icon-btn:hover { background:rgba(255,255,255,0.25); }
+
+/* ========= VIEWS ========= */
+.view { display:none; flex:1; overflow-y:auto; padding-bottom:80px; }
+.view.active { display:block; }
+
+/* ========= BOTTOM NAV ========= */
+.bottom-nav {
+  background: var(--navy);
+  position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:480px;
+  display:flex; z-index:200;
+  border-top:3px solid var(--saffron);
+}
+.nav-btn {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  padding:8px 4px 12px; cursor:pointer; color:rgba(255,255,255,0.45);
+  transition:color 0.2s, background 0.2s; border:none; background:none;
+  gap:2px;
+}
+.nav-btn.active { color:var(--saffron-light); background:rgba(232,105,10,0.12); }
+.nav-icon { font-size:1.3rem; }
+.nav-label { font-size:0.58rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; font-family:'Baloo 2', sans-serif; }
+
+/* ========= DASHBOARD ========= */
+.hero {
+  background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 50%, #1e4d96 100%);
+  padding:24px 18px 36px; color:#fff; position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute; top:-40px; right:-40px;
+  width:200px; height:200px; border-radius:50%;
+  background: radial-gradient(circle, rgba(232,105,10,0.3) 0%, transparent 70%);
+}
+.hero::after {
+  content:''; position:absolute; bottom:-60px; left:20px;
+  width:140px; height:140px; border-radius:50%;
+  background: radial-gradient(circle, rgba(245,166,35,0.15) 0%, transparent 70%);
+}
+.hero-date { font-size:0.72rem; opacity:0.65; margin-bottom:4px; letter-spacing:0.06em; text-transform:uppercase; }
+.hero-school { font-family:'Baloo 2', sans-serif; font-size:1rem; font-weight:700; margin-bottom:16px; opacity:0.9; }
+.hero-bal-lbl { font-size:0.72rem; opacity:0.65; text-transform:uppercase; letter-spacing:0.07em; }
+.hero-bal { font-family:'Baloo 2', sans-serif; font-size:3rem; font-weight:800; line-height:1; color:#fff; }
+.hero-bal sup { font-size:1.3rem; vertical-align:super; }
+.hero-bal-sub { font-size:0.72rem; opacity:0.6; margin-top:4px; }
+
+.stat-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:12px 14px; margin-top:-18px; position:relative; z-index:10; }
+.stat-card {
+  background: var(--white); border-radius:var(--r); padding:16px 14px;
+  box-shadow: var(--shadow); border:1px solid var(--border);
+}
+.stat-icon { font-size:1.5rem; margin-bottom:8px; }
+.stat-val { font-family:'Baloo 2', sans-serif; font-size:1.5rem; font-weight:800; color:var(--navy); line-height:1; }
+.stat-lbl { font-size:0.68rem; color:var(--text2); margin-top:3px; text-transform:uppercase; letter-spacing:0.04em; }
+
+.section-hdr { display:flex; align-items:center; justify-content:space-between; padding:16px 16px 10px; }
+.section-title { font-family:'Baloo 2', sans-serif; font-size:1.15rem; font-weight:700; color:var(--navy); }
+.see-all { font-size:0.78rem; color:var(--saffron); font-weight:700; border:none; background:none; cursor:pointer; font-family:'Baloo 2', sans-serif; }
+
+.quick-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 14px 16px; }
+.qa-btn {
+  background:var(--white); border:1.5px solid var(--border); border-radius:var(--r);
+  padding:16px 12px; cursor:pointer; display:flex; flex-direction:column; align-items:center;
+  gap:6px; box-shadow:var(--shadow); transition:transform 0.15s, box-shadow 0.15s;
+  font-family:'Baloo 2', sans-serif; font-size:0.82rem; font-weight:700; color:var(--navy);
+}
+.qa-btn:active { transform:scale(0.97); }
+.qa-btn .qa-icon { font-size:1.8rem; }
+
+/* ========= STUDENTS LIST ========= */
+.search-bar {
+  padding:12px 14px; background:var(--white); border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:50; display:flex; gap:8px;
+}
+.search-input {
+  flex:1; border:1.5px solid var(--border); border-radius:10px;
+  padding:9px 14px; font-size:0.88rem; font-family:'Noto Sans Devanagari', sans-serif;
+  background:var(--cream); color:var(--text); outline:none;
+}
+.search-input:focus { border-color:var(--navy-light); background:#fff; }
+.filter-btn {
+  background:var(--navy); color:#fff; border:none; border-radius:10px;
+  padding:8px 14px; font-size:0.8rem; font-weight:700; cursor:pointer;
+  font-family:'Baloo 2', sans-serif; white-space:nowrap;
+}
+
+.filter-row {
+  display:none; flex-wrap:wrap; gap:6px; padding:8px 14px;
+  background:var(--white); border-bottom:1px solid var(--border);
+}
+.filter-row.show { display:flex; }
+.chip {
+  padding:4px 12px; border-radius:100px; font-size:0.72rem; font-weight:700;
+  background:var(--cream2); color:var(--text2); cursor:pointer; border:1.5px solid transparent;
+  font-family:'Baloo 2', sans-serif; transition:all 0.2s;
+}
+.chip.active { background:var(--navy); color:#fff; border-color:var(--navy); }
+
+.student-list { padding:12px 14px; display:flex; flex-direction:column; gap:10px; }
+.student-card {
+  background:var(--white); border-radius:var(--r); padding:14px;
+  box-shadow:var(--shadow); display:flex; align-items:center; gap:12px;
+  cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
+  border:1.5px solid transparent;
+}
+.student-card:hover { transform:translateY(-1px); box-shadow:var(--shadow-lg); border-color:var(--cream2); }
+.avatar {
+  width:46px; height:46px; border-radius:12px; flex-shrink:0;
+  background:linear-gradient(135deg, var(--saffron) 0%, var(--navy) 100%);
+  color:#fff; display:flex; align-items:center; justify-content:center;
+  font-family:'Baloo 2', sans-serif; font-size:1.1rem; font-weight:800;
+}
+.s-info { flex:1; min-width:0; }
+.s-name { font-weight:700; font-size:0.92rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.s-meta { font-size:0.72rem; color:var(--text2); margin-top:2px; }
+.s-bal { text-align:right; flex-shrink:0; }
+.s-bal-amt { font-family:'Baloo 2', sans-serif; font-size:1.15rem; font-weight:800; color:var(--navy); }
+.s-bal-lbl { font-size:0.62rem; color:var(--text2); text-transform:uppercase; }
+
+.fab {
+  position:fixed; bottom:90px; right:calc(50% - 240px + 16px);
+  width:52px; height:52px; border-radius:14px;
+  background:linear-gradient(135deg, var(--saffron) 0%, var(--saffron-light) 100%);
+  color:#fff; border:none; font-size:1.7rem; cursor:pointer;
+  box-shadow: 0 6px 24px rgba(232,105,10,0.5);
+  display:flex; align-items:center; justify-content:center; z-index:50;
+  transition:transform 0.2s;
+}
+.fab:active { transform:scale(0.95); }
+
+/* ========= STUDENT DETAIL ========= */
+.detail-hero {
+  background:linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 100%);
+  padding:20px 18px 28px; color:#fff; position:relative; overflow:hidden;
+}
+.detail-hero::before {
+  content:''; position:absolute; right:-30px; top:-30px;
+  width:120px; height:120px; border-radius:50%;
+  background:radial-gradient(circle, rgba(232,105,10,0.25), transparent 70%);
+}
+.dh-name { font-family:'Baloo 2', sans-serif; font-size:1.6rem; font-weight:800; margin-bottom:2px; }
+.dh-meta { font-size:0.8rem; opacity:0.7; }
+.dh-acct { font-size:0.72rem; opacity:0.55; margin-top:2px; font-family:monospace; }
+
+.bal-strip {
+  background:var(--white); margin:0 14px; margin-top:-18px;
+  border-radius:var(--r-lg); box-shadow:var(--shadow-lg);
+  padding:18px; display:grid; grid-template-columns:1fr 1px 1fr 1px 1fr;
+  gap:0; align-items:center;
+}
+.bal-item { text-align:center; padding:0 8px; }
+.bal-item-divider { background:var(--border); height:36px; }
+.bal-val { font-family:'Baloo 2', sans-serif; font-size:1.3rem; font-weight:800; line-height:1; }
+.bal-val.green { color:var(--green); }
+.bal-val.red { color:var(--red); }
+.bal-val.navy { color:var(--navy); }
+.bal-item-lbl { font-size:0.62rem; color:var(--text2); text-transform:uppercase; letter-spacing:0.04em; margin-top:3px; }
+
+.qr-card {
+  margin:14px; background:var(--white); border-radius:var(--r);
+  padding:16px; box-shadow:var(--shadow); display:flex; align-items:center; gap:16px;
+}
+.qr-box {
+  width:88px; height:88px; flex-shrink:0; background:#fff;
+  border:2px solid var(--cream2); border-radius:10px;
+  display:flex; align-items:center; justify-content:center; overflow:hidden;
+}
+.qr-info h4 { font-family:'Baloo 2', sans-serif; font-weight:700; font-size:0.9rem; margin-bottom:4px; }
+.qr-info p { font-size:0.75rem; color:var(--text2); }
+.qr-dl-btn {
+  margin-top:8px; background:var(--cream2); border:none; border-radius:8px;
+  padding:5px 14px; font-size:0.75rem; font-weight:700; cursor:pointer; color:var(--navy);
+  font-family:'Baloo 2', sans-serif;
+}
+
+.txn-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:4px 14px 14px; }
+.txn-action {
+  border:none; border-radius:14px; padding:14px;
+  cursor:pointer; font-family:'Baloo 2', sans-serif;
+  font-weight:700; font-size:0.9rem; display:flex; flex-direction:column;
+  align-items:center; gap:4px; transition:transform 0.1s;
+}
+.txn-action:active { transform:scale(0.97); }
+.txn-action.dep { background:var(--green-light); color:var(--green); border:1.5px solid #9ee0b0; }
+.txn-action.wdr { background:var(--red-light); color:var(--red); border:1.5px solid #f5b0aa; }
+.txn-action .ta-icon { font-size:1.6rem; }
+
+/* ========= TRANSACTIONS ========= */
+.txn-list { padding:4px 14px 12px; }
+.txn-item {
+  background:var(--white); border-radius:12px; padding:12px 14px;
+  margin-bottom:8px; box-shadow:var(--shadow);
+  display:flex; align-items:center; gap:12px;
+}
+.txn-dot {
+  width:40px; height:40px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.1rem; flex-shrink:0;
+}
+.txn-dot.deposit { background:var(--green-light); }
+.txn-dot.withdrawal { background:var(--red-light); }
+.txn-details { flex:1; min-width:0; }
+.txn-name { font-weight:700; font-size:0.82rem; color:var(--text2); }
+.txn-type { font-weight:600; font-size:0.88rem; text-transform:capitalize; }
+.txn-desc { font-size:0.72rem; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.txn-date { font-size:0.68rem; color:var(--text2); }
+.txn-amt { text-align:right; flex-shrink:0; }
+.txn-amt-val { font-family:'Baloo 2', sans-serif; font-size:1.1rem; font-weight:800; }
+.txn-amt-val.deposit { color:var(--green); }
+.txn-amt-val.withdrawal { color:var(--red); }
+
+/* ========= ADD STUDENT ========= */
+.form-wrap { padding:16px 14px; }
+.form-card {
+  background:var(--white); border-radius:var(--r-lg); padding:20px;
+  box-shadow:var(--shadow); margin-bottom:14px; border:1px solid var(--border);
+}
+.form-card-title {
+  font-family:'Baloo 2', sans-serif; font-size:1.1rem; font-weight:700;
+  color:var(--navy); margin-bottom:16px; padding-bottom:10px; border-bottom:1px solid var(--border);
+}
+.form-grp { margin-bottom:14px; }
+.form-grp:last-child { margin-bottom:0; }
+.form-lbl { font-size:0.75rem; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; display:block; }
+.form-inp, .form-sel {
+  width:100%; border:1.5px solid var(--border); border-radius:10px;
+  padding:10px 13px; font-size:0.88rem; font-family:'Noto Sans Devanagari', sans-serif;
+  color:var(--text); background:var(--cream); outline:none; transition:border-color 0.2s;
+}
+.form-inp:focus, .form-sel:focus { border-color:var(--navy-light); background:#fff; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.btn-pri {
+  width:100%; background:linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+  color:#fff; border:none; border-radius:12px; padding:14px;
+  font-size:0.98rem; font-weight:700; font-family:'Baloo 2', sans-serif;
+  cursor:pointer; transition:opacity 0.2s;
+}
+.btn-pri:active { opacity:0.9; }
+.btn-sec {
+  width:100%; background:var(--cream2); color:var(--navy); border:1.5px solid var(--border);
+  border-radius:12px; padding:13px; font-size:0.92rem; font-weight:700;
+  font-family:'Baloo 2', sans-serif; cursor:pointer; margin-top:8px;
+}
+
+/* ========= DAILY LOG ========= */
+.daily-hdr {
+  background:var(--white); padding:14px; border-bottom:1px solid var(--border);
+  position:sticky; top:0; z-index:50;
+}
+.daily-hdr-title { font-family:'Baloo 2', sans-serif; font-size:1.1rem; font-weight:700; color:var(--navy); margin-bottom:10px; }
+.date-row { display:flex; gap:8px; align-items:center; }
+.date-inp {
+  flex:1; border:1.5px solid var(--border); border-radius:10px;
+  padding:8px 12px; font-size:0.88rem; font-family:'Noto Sans Devanagari', sans-serif;
+  background:var(--cream); outline:none;
+}
+.today-btn {
+  background:var(--navy); color:#fff; border:none; border-radius:10px;
+  padding:8px 14px; font-size:0.8rem; font-weight:700; cursor:pointer; font-family:'Baloo 2', sans-serif;
+}
+.daily-stats {
+  display:flex; background:var(--white); padding:10px 14px;
+  border-bottom:1px solid var(--border); gap:0;
+}
+.ds { flex:1; text-align:center; padding:8px; }
+.ds + .ds { border-left:1px solid var(--border); }
+.ds-val { font-family:'Baloo 2', sans-serif; font-size:1.2rem; font-weight:800; }
+.ds-lbl { font-size:0.62rem; color:var(--text2); text-transform:uppercase; letter-spacing:0.04em; }
+
+/* ========= IMPORT/EXPORT ========= */
+.import-zone {
+  margin:14px; border:2.5px dashed var(--border); border-radius:var(--r-lg);
+  padding:32px 20px; text-align:center; cursor:pointer; background:var(--white);
+  transition:border-color 0.2s, background 0.2s;
+}
+.import-zone:hover, .import-zone.drag { border-color:var(--saffron); background:var(--saffron-pale); }
+.import-zone-icon { font-size:2.5rem; margin-bottom:12px; }
+.import-zone h3 { font-family:'Baloo 2', sans-serif; font-size:1.15rem; color:var(--navy); margin-bottom:6px; }
+.import-zone p { font-size:0.8rem; color:var(--text2); }
+.import-preview { margin:0 14px 14px; background:var(--white); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden; }
+.preview-hdr { padding:10px 14px; background:var(--navy); color:#fff; font-weight:700; font-size:0.85rem; font-family:'Baloo 2', sans-serif; }
+.preview-tbl { overflow-x:auto; }
+.preview-tbl table { width:100%; border-collapse:collapse; font-size:0.76rem; }
+.preview-tbl th { background:var(--cream2); padding:7px 10px; text-align:left; font-weight:700; color:var(--text2); text-transform:uppercase; font-size:0.66rem; border-bottom:1px solid var(--border); }
+.preview-tbl td { padding:7px 10px; border-bottom:1px solid var(--border); }
+
+.export-list { margin:14px; background:var(--white); border-radius:var(--r-lg); box-shadow:var(--shadow); overflow:hidden; }
+.export-item {
+  display:flex; align-items:center; gap:14px; padding:16px;
+  border-bottom:1px solid var(--border); cursor:pointer; transition:background 0.2s;
+}
+.export-item:hover { background:var(--cream); }
+.export-item:last-child { border-bottom:none; }
+.export-icon-box { width:44px; height:44px; border-radius:12px; background:var(--saffron-pale); display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+.export-info h4 { font-family:'Baloo 2', sans-serif; font-weight:700; font-size:0.9rem; }
+.export-info p { font-size:0.72rem; color:var(--text2); margin-top:2px; }
+.export-arrow { margin-left:auto; color:var(--text2); font-size:1.1rem; }
+
+/* ========= REPORTS ========= */
+.report-section { padding:14px; }
+.report-card {
+  background:var(--white); border-radius:var(--r-lg); padding:18px;
+  box-shadow:var(--shadow); margin-bottom:14px; border:1px solid var(--border);
+}
+.report-card-title { font-family:'Baloo 2', sans-serif; font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:14px; }
+.top-list { display:flex; flex-direction:column; gap:8px; }
+.top-item {
+  display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; background:var(--cream);
+}
+.top-rank { width:28px; height:28px; border-radius:8px; background:var(--navy); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2', sans-serif; font-size:0.8rem; font-weight:800; flex-shrink:0; }
+.top-rank.gold { background:var(--gold); color:#fff; }
+.top-rank.silver { background:#8a9aaa; }
+.top-rank.bronze { background:#c17640; }
+.top-name { flex:1; font-size:0.85rem; font-weight:600; }
+.top-val { font-family:'Baloo 2', sans-serif; font-size:1rem; font-weight:800; color:var(--navy); }
+
+/* ========= MODAL ========= */
+.modal-bg {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+  z-index:500; align-items:flex-end; backdrop-filter:blur(4px);
+}
+.modal-bg.show { display:flex; }
+.modal {
+  background:var(--white); border-radius:22px 22px 0 0;
+  width:100%; max-width:480px; margin:0 auto;
+  padding:20px 18px 30px; max-height:90vh; overflow-y:auto;
+  animation:slideUp 0.25s ease;
+}
+@keyframes slideUp { from { transform:translateY(40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.modal-handle { width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 16px; }
+.modal-title { font-family:'Baloo 2', sans-serif; font-size:1.35rem; font-weight:800; color:var(--navy); margin-bottom:16px; }
+.txn-toggle { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+.type-toggle {
+  border:2px solid var(--border); border-radius:12px; padding:12px;
+  font-family:'Baloo 2', sans-serif; font-weight:700; font-size:0.88rem;
+  cursor:pointer; background:var(--cream); transition:all 0.2s;
+}
+.type-toggle.dep.active { background:var(--green-light); border-color:var(--green); color:var(--green); }
+.type-toggle.wdr.active { background:var(--red-light); border-color:var(--red); color:var(--red); }
+
+/* ========= TOAST ========= */
+.toast {
+  position:fixed; top:72px; left:50%; transform:translateX(-50%) translateY(-120px);
+  background:var(--navy); color:#fff; padding:12px 24px;
+  border-radius:100px; font-size:0.85rem; font-weight:600;
+  z-index:1000; transition:transform 0.3s ease; white-space:nowrap;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.3); font-family:'Baloo 2', sans-serif;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.success { background:var(--green); }
+.toast.error { background:var(--red); }
+.toast.info { background:var(--saffron); color:#fff; }
+
+/* ========= EMPTY ========= */
+.empty { text-align:center; padding:48px 24px; color:var(--text2); }
+.empty-icon { font-size:3.5rem; margin-bottom:14px; opacity:0.5; }
+.empty-title { font-family:'Baloo 2', sans-serif; font-size:1.2rem; color:var(--navy); margin-bottom:6px; font-weight:700; }
+.empty-sub { font-size:0.82rem; }
+
+/* ========= MISC ========= */
+.divider { height:1px; background:var(--border); margin:0 14px; }
+.badge { display:inline-flex; align-items:center; background:var(--cream2); border-radius:100px; padding:3px 10px; font-size:0.7rem; font-weight:700; color:var(--text2); font-family:'Baloo 2', sans-serif; }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cream: #0f1520; --cream2: #1a2535; --white: #1e2d42;
+    --border: #2a3d5a; --text: #e8eef8; --text2: #8a9bbf;
+    --navy: #1a3060; --sky: #0a1528;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  <button class="topbar-back" id="back-btn" onclick="goBack()">&#8592;</button>
+  <div class="topbar-brand">
+    <span class="topbar-flag">🏛️</span>
+    <div>
+      <div class="topbar-title">ZPHS <span>Student Bank</span></div>
+      <div class="topbar-sub">2024–2025</div>
+    </div>
+  </div>
+  <div class="topbar-icons">
+    <button class="icon-btn" onclick="nav('search')" title="Quick Search">🔍</button>
+    <button class="icon-btn" onclick="nav('export')" title="Export">📤</button>
+  </div>
+</div>
+
+<!-- ============ VIEWS ============ -->
+
+<!-- DASHBOARD -->
+<div class="view active" id="view-dashboard">
+  <div class="hero">
+    <div class="hero-date" id="hero-date"></div>
+    <div class="hero-school">जिल्हा परिषद हायस्कूल – विद्यार्थी बचत बँक</div>
+    <div class="hero-bal-lbl">एकूण बँक शिल्लक</div>
+    <div class="hero-bal">₹<span id="hero-total">0</span></div>
+    <div class="hero-bal-sub" id="hero-sub"></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-val" id="stat-students">0</div>
+      <div class="stat-lbl">विद्यार्थी</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💳</div>
+      <div class="stat-val" id="stat-txns">0</div>
+      <div class="stat-lbl">व्यवहार</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⬆️</div>
+      <div class="stat-val" id="stat-dep">₹0</div>
+      <div class="stat-lbl">एकूण जमा</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⬇️</div>
+      <div class="stat-val" id="stat-wd">₹0</div>
+      <div class="stat-lbl">एकूण खर्च</div>
+    </div>
+  </div>
+  <div class="section-hdr">
+    <div class="section-title">अलीकडील व्यवहार</div>
+    <button class="see-all" onclick="nav('daily')">सर्व पहा</button>
+  </div>
+  <div class="txn-list" id="recent-txns"></div>
+  <div class="section-hdr"><div class="section-title">त्वरित क्रिया</div></div>
+  <div class="quick-actions">
+    <button class="qa-btn" onclick="nav('add-student')"><span class="qa-icon">➕</span>नवीन विद्यार्थी</button>
+    <button class="qa-btn" onclick="nav('search')"><span class="qa-icon">🔍</span>विद्यार्थी शोधा</button>
+    <button class="qa-btn" onclick="nav('import')"><span class="qa-icon">📥</span>Excel आयात</button>
+    <button class="qa-btn" onclick="nav('reports')"><span class="qa-icon">📊</span>अहवाल</button>
+  </div>
+</div>
+
+<!-- STUDENTS LIST -->
+<div class="view" id="view-students">
+  <div class="search-bar">
+    <input type="text" class="search-input" id="s-search" placeholder="नाव, वर्ग किंवा खाते क्रमांक शोधा..." oninput="renderStudents()">
+    <button class="filter-btn" onclick="toggleFilter()">वर्ग ▼</button>
+  </div>
+  <div class="filter-row" id="filter-row"></div>
+  <div class="student-list" id="student-list"></div>
+  <button class="fab" onclick="nav('add-student')">+</button>
+</div>
+
+<!-- SEARCH VIEW -->
+<div class="view" id="view-search">
+  <div class="search-bar">
+    <input type="text" class="search-input" id="global-search" placeholder="विद्यार्थी शोधा..." oninput="renderGlobalSearch()" autofocus>
+  </div>
+  <div class="student-list" id="global-results">
+    <div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">नाव टाइप करा</div></div>
+  </div>
+</div>
+
+<!-- ADD STUDENT -->
+<div class="view" id="view-add-student">
+  <div class="form-wrap">
+    <div class="form-card">
+      <div class="form-card-title">📝 नवीन विद्यार्थी नोंदणी</div>
+      <div class="form-grp">
+        <label class="form-lbl">विद्यार्थ्याचे नाव *</label>
+        <input type="text" class="form-inp" id="new-name" placeholder="पूर्ण नाव">
+      </div>
+      <div class="form-row">
+        <div class="form-grp">
+          <label class="form-lbl">खाते क्रमांक *</label>
+          <input type="text" class="form-inp" id="new-acc" placeholder="e.g. 111">
+        </div>
+        <div class="form-grp">
+          <label class="form-lbl">क्र</label>
+          <input type="text" class="form-inp" id="new-roll" placeholder="e.g. 25">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-grp">
+          <label class="form-lbl">वर्ग</label>
+          <input type="text" class="form-inp" id="new-class" placeholder="e.g. 8वी">
+        </div>
+        <div class="form-grp">
+          <label class="form-lbl">प्रारंभिक शिल्लक (₹)</label>
+          <input type="number" class="form-inp" id="new-bal" placeholder="0" min="0">
+        </div>
+      </div>
+    </div>
+    <button class="btn-pri" onclick="addStudent()">✅ खाते तयार करा</button>
+    <button class="btn-sec" onclick="goBack()">रद्द करा</button>
+  </div>
+</div>
+
+<!-- STUDENT DETAIL -->
+<div class="view" id="view-student-detail">
+  <div class="detail-hero">
+    <div class="dh-name" id="dh-name">-</div>
+    <div class="dh-meta" id="dh-meta">-</div>
+    <div class="dh-acct" id="dh-acct">-</div>
+  </div>
+  <div class="bal-strip">
+    <div class="bal-item">
+      <div class="bal-val green" id="bc-dep">₹0</div>
+      <div class="bal-item-lbl">जमा</div>
+    </div>
+    <div class="bal-item-divider"></div>
+    <div class="bal-item">
+      <div class="bal-val red" id="bc-wd">₹0</div>
+      <div class="bal-item-lbl">खर्च</div>
+    </div>
+    <div class="bal-item-divider"></div>
+    <div class="bal-item">
+      <div class="bal-val navy" id="bc-bal">₹0</div>
+      <div class="bal-item-lbl">शिल्लक</div>
+    </div>
+  </div>
+  <div class="qr-card">
+    <div class="qr-box" id="detail-qr"></div>
+    <div class="qr-info">
+      <h4>विद्यार्थी QR कोड</h4>
+      <p>स्कॅन करून खाते उघडा</p>
+      <button class="qr-dl-btn" onclick="downloadQR()">⬇ डाउनलोड</button>
+    </div>
+  </div>
+  <div class="txn-actions">
+    <button class="txn-action dep" onclick="openTxnModal('deposit')">
+      <span class="ta-icon">⬆️</span>जमा करा
+    </button>
+    <button class="txn-action wdr" onclick="openTxnModal('withdrawal')">
+      <span class="ta-icon">⬇️</span>काढा
+    </button>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 16px;">
+    <div class="section-title">व्यवहार इतिहास</div>
+    <div class="badge" id="txn-count">0 व्यवहार</div>
+  </div>
+  <div class="txn-list" id="detail-txns"></div>
+  <div style="padding:0 14px 8px;">
+    <button class="btn-sec" style="color:var(--red)" onclick="confirmDelete()">🗑️ खाते हटवा</button>
+  </div>
+</div>
+
+<!-- DAILY LOG -->
+<div class="view" id="view-daily">
+  <div class="daily-hdr">
+    <div class="daily-hdr-title">📅 दैनिक व्यवहार नोंद</div>
+    <div class="date-row">
+      <input type="date" class="date-inp" id="daily-date" onchange="renderDaily()">
+      <button class="today-btn" onclick="setToday()">आज</button>
+    </div>
+  </div>
+  <div class="daily-stats">
+    <div class="ds"><div class="ds-val" id="dl-count">0</div><div class="ds-lbl">व्यवहार</div></div>
+    <div class="ds"><div class="ds-val" style="color:var(--green)" id="dl-dep">₹0</div><div class="ds-lbl">जमा</div></div>
+    <div class="ds"><div class="ds-val" style="color:var(--red)" id="dl-wd">₹0</div><div class="ds-lbl">खर्च</div></div>
+    <div class="ds"><div class="ds-val" style="color:var(--navy)" id="dl-net">₹0</div><div class="ds-lbl">निव्वळ</div></div>
+  </div>
+  <div class="txn-list" id="daily-txns"></div>
+</div>
+
+<!-- IMPORT -->
+<div class="view" id="view-import">
+  <div class="form-wrap" style="padding-bottom:4px;">
+    <div style="font-family:'Baloo 2',sans-serif;font-size:1.2rem;font-weight:800;color:var(--navy);padding:4px 0 14px;">📥 Excel / CSV आयात</div>
+  </div>
+  <div class="import-zone" id="import-zone" onclick="document.getElementById('imp-file').click()">
+    <div class="import-zone-icon">📄</div>
+    <h3>Excel / CSV फाइल निवडा</h3>
+    <p>Files: .xlsx, .xls, .csv</p>
+    <p style="margin-top:8px;font-size:0.72rem;color:var(--saffron);">स्तंभ: Account Number, Student Name, Class, Opening Balance</p>
+  </div>
+  <input type="file" id="imp-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleImport(event)">
+  <div id="import-preview"></div>
+  <div class="form-wrap">
+    <div class="form-card">
+      <div class="form-card-title">Excel स्वरूप उदाहरण</div>
+      <div class="preview-tbl">
+        <table>
+          <thead><tr><th>Account</th><th>Name</th><th>Class</th><th>Balance</th></tr></thead>
+          <tbody>
+            <tr><td>111</td><td>रामेश्वर पाटील</td><td>7वी</td><td>0</td></tr>
+            <tr><td>112</td><td>सीमा जाधव</td><td>8वी</td><td>100</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT -->
+<div class="view" id="view-export">
+  <div class="form-wrap" style="padding-bottom:4px;">
+    <div style="font-family:'Baloo 2',sans-serif;font-size:1.2rem;font-weight:800;color:var(--navy);padding:4px 0 14px;">📤 डेटा निर्यात</div>
+  </div>
+  <div class="export-list">
+    <div class="export-item" onclick="exportFull()">
+      <div class="export-icon-box">📊</div>
+      <div class="export-info"><h4>संपूर्ण Excel अहवाल</h4><p>विद्यार्थी + सर्व व्यवहार + सारांश</p></div>
+      <div class="export-arrow">›</div>
+    </div>
+    <div class="export-item" onclick="exportStudentCSV()">
+      <div class="export-icon-box">👥</div>
+      <div class="export-info"><h4>विद्यार्थी यादी (CSV)</h4><p>सध्याच्या शिल्लकीसह सर्व विद्यार्थी</p></div>
+      <div class="export-arrow">›</div>
+    </div>
+    <div class="export-item" onclick="exportTodayCSV()">
+      <div class="export-icon-box">📅</div>
+      <div class="export-info"><h4>आजचे व्यवहार (CSV)</h4><p>आजच्या सर्व व्यवहारांची नोंद</p></div>
+      <div class="export-arrow">›</div>
+    </div>
+    <div class="export-item" onclick="exportAllTxnsCSV()">
+      <div class="export-icon-box">📋</div>
+      <div class="export-info"><h4>सर्व व्यवहार (CSV)</h4><p>संपूर्ण व्यवहार इतिहास</p></div>
+      <div class="export-arrow">›</div>
+    </div>
+    <div class="export-item" onclick="exportHomepageFormat()">
+      <div class="export-icon-box">🏠</div>
+      <div class="export-info"><h4>Homepage Excel (मूळ स्वरूप)</h4><p>मूळ Excel फाइल सारखा स्वरूप</p></div>
+      <div class="export-arrow">›</div>
+    </div>
+  </div>
+  <div class="form-wrap">
+    <div class="form-card" style="border-color:var(--red);background:var(--red-light);">
+      <div class="form-card-title" style="color:var(--red);">⚠️ डेटा रीसेट</div>
+      <p style="font-size:0.8rem;color:var(--red);margin-bottom:14px;">हे सर्व विद्यार्थी खाती आणि व्यवहार कायमचे हटवेल!</p>
+      <button onclick="confirmReset()" style="width:100%;background:var(--red);color:#fff;border:none;border-radius:10px;padding:12px;font-size:0.9rem;font-weight:700;font-family:'Baloo 2',sans-serif;cursor:pointer;">🗑️ सर्व डेटा हटवा</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPORTS -->
+<div class="view" id="view-reports">
+  <div class="report-section">
+    <div class="report-card">
+      <div class="report-card-title">🏆 सर्वाधिक शिल्लक (Top 10)</div>
+      <div class="top-list" id="top-balance"></div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">📈 सर्वाधिक जमा (Top 10)</div>
+      <div class="top-list" id="top-deposits"></div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">📊 वर्गनिहाय शिल्लक</div>
+      <div class="top-list" id="class-summary"></div>
+    </div>
+    <div class="report-card">
+      <div class="report-card-title">🔍 शून्य शिल्लक विद्यार्थी</div>
+      <div class="top-list" id="zero-balance"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TXN MODAL -->
+<div class="modal-bg" id="txn-modal" onclick="closeTxnModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-title">व्यवहार नोंदवा</div>
+    <div class="txn-toggle">
+      <button class="type-toggle dep" id="tt-dep" onclick="setTxnType('deposit')">⬆️ जमा</button>
+      <button class="type-toggle wdr" id="tt-wd" onclick="setTxnType('withdrawal')">⬇️ खर्च</button>
+    </div>
+    <div class="form-grp">
+      <label class="form-lbl">रक्कम (₹) *</label>
+      <input type="number" class="form-inp" id="txn-amt" placeholder="रक्कम टाइप करा" min="1">
+    </div>
+    <div class="form-grp">
+      <label class="form-lbl">दिनांक</label>
+      <input type="date" class="form-inp" id="txn-date">
+    </div>
+    <div class="form-grp">
+      <label class="form-lbl">विवरण (पर्यायी)</label>
+      <input type="text" class="form-inp" id="txn-desc" placeholder="e.g. बचत जमा, पुस्तक खरेदी">
+    </div>
+    <div style="height:6px;"></div>
+    <button class="btn-pri" onclick="saveTxn()">✅ व्यवहार नोंदवा</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-view="dashboard" onclick="nav('dashboard')">
+    <span class="nav-icon">🏠</span><span class="nav-label">मुख्यपृष्ठ</span>
+  </button>
+  <button class="nav-btn" data-view="students" onclick="nav('students')">
+    <span class="nav-icon">👥</span><span class="nav-label">विद्यार्थी</span>
+  </button>
+  <button class="nav-btn" data-view="daily" onclick="nav('daily')">
+    <span class="nav-icon">📅</span><span class="nav-label">दैनंदिन</span>
+  </button>
+  <button class="nav-btn" data-view="reports" onclick="nav('reports')">
+    <span class="nav-icon">📊</span><span class="nav-label">अहवाल</span>
+  </button>
+  <button class="nav-btn" data-view="export" onclick="nav('export')">
+    <span class="nav-icon">📤</span><span class="nav-label">निर्यात</span>
+  </button>
+</nav>
+
+<script>
+// ============================================================
+// PRE-LOADED EXCEL DATA
+// ============================================================
+const EXCEL_STUDENTS = [{"id": 1, "accountNumber": "1", "name": "मोरे पुजा उमेश", "class": "7वी", "rollNumber": "1", "openingBalance": 0.0}, {"id": 2, "accountNumber": "2", "name": "अंकुशे राधा धर्मा", "class": "7वी", "rollNumber": "2", "openingBalance": 0.0}, {"id": 3, "accountNumber": "3", "name": "कोकरे गायत्री", "class": "7वी", "rollNumber": "3", "openingBalance": 0.0}, {"id": 4, "accountNumber": "4", "name": "जाधव वैष्णवी ज्ञानेश्वर", "class": "7वी", "rollNumber": "4", "openingBalance": 0.0}, {"id": 5, "accountNumber": "5", "name": "यरसन नितेश", "class": "7वी", "rollNumber": "5", "openingBalance": 0.0}, {"id": 6, "accountNumber": "6", "name": "यचमे प्रेम नेताजी", "class": "7वी", "rollNumber": "6", "openingBalance": 0.0}, {"id": 7, "accountNumber": "7", "name": "पिरजादे अल्ताफ मुन्ना", "class": "7वी", "rollNumber": "7", "openingBalance": 0.0}, {"id": 8, "accountNumber": "8", "name": "कदम अर्जुन चंद्रकांत", "class": "7वी", "rollNumber": "8", "openingBalance": 0.0}, {"id": 9, "accountNumber": "9", "name": "कांबळे आर्यन संतोष", "class": "7वी", "rollNumber": "9", "openingBalance": 0.0}, {"id": 10, "accountNumber": "10", "name": "नदाफ आफताब सिकंदर", "class": "7वी", "rollNumber": "10", "openingBalance": 0.0}, {"id": 11, "accountNumber": "11", "name": "कांबळे अनिल दिलीप", "class": "7वी", "rollNumber": "11", "openingBalance": 0.0}, {"id": 12, "accountNumber": "12", "name": "सगर उदयराज युवराज", "class": "7वी", "rollNumber": "12", "openingBalance": 0.0}, {"id": 13, "accountNumber": "13", "name": "गायकवाड गिता नेताजी", "class": "8 वी", "rollNumber": "13", "openingBalance": 0.0}, {"id": 14, "accountNumber": "14", "name": "माने ईश्वरी प्रकाश", "class": "8 वी", "rollNumber": "14", "openingBalance": 0.0}, {"id": 15, "accountNumber": "15", "name": "उस्ताद आफिया आजम", "class": "8 वी", "rollNumber": "15", "openingBalance": 0.0}, {"id": 16, "accountNumber": "16", "name": "माने नेहा दगडू", "class": "8 वी", "rollNumber": "16", "openingBalance": 0.0}, {"id": 17, "accountNumber": "17", "name": "दंडगुले सुजाता तायप्पा", "class": "8 वी", "rollNumber": "17", "openingBalance": 0.0}, {"id": 18, "accountNumber": "18", "name": "कांबळे करिश्मा दिलीप", "class": "8 वी", "rollNumber": "18", "openingBalance": 0.0}, {"id": 19, "accountNumber": "19", "name": "धोत्रे अर्चना", "class": "8 वी", "rollNumber": "19", "openingBalance": 0.0}, {"id": 20, "accountNumber": "20", "name": "जाधव प्रमिला धनराज", "class": "8 वी", "rollNumber": "20", "openingBalance": 0.0}, {"id": 21, "accountNumber": "21", "name": "पोतदार किरण हणमंत", "class": "8 वी", "rollNumber": "21", "openingBalance": 0.0}, {"id": 22, "accountNumber": "22", "name": "बनसोडे श्रावणी भास्कर", "class": "8 वी", "rollNumber": "22", "openingBalance": 0.0}, {"id": 23, "accountNumber": "23", "name": "पवार पल्लवी दशरथ", "class": "8 वी", "rollNumber": "23", "openingBalance": 0.0}, {"id": 24, "accountNumber": "24", "name": "सगर आदित्य त्र्यंबक", "class": "8 वी", "rollNumber": "24", "openingBalance": 0.0}, {"id": 25, "accountNumber": "25", "name": "माने लक्ष्मण नानाराव", "class": "8 वी", "rollNumber": "25", "openingBalance": 0.0}, {"id": 26, "accountNumber": "26", "name": "शिंदे शिवदर्शन त्रिमुर्ती", "class": "8 वी", "rollNumber": "26", "openingBalance": 0.0}, {"id": 27, "accountNumber": "27", "name": "कांबळे आनंद मुरलीधर", "class": "8 वी", "rollNumber": "27", "openingBalance": 0.0}, {"id": 28, "accountNumber": "28", "name": "रोहित खंडू पवार", "class": "8 वी", "rollNumber": "28", "openingBalance": 0.0}, {"id": 29, "accountNumber": "29", "name": "दिवे विकी राजेंद्र", "class": "8 वी", "rollNumber": "29", "openingBalance": 0.0}, {"id": 30, "accountNumber": "30", "name": "दुबे दुर्गेश लक्ष्मण", "class": "8 वी", "rollNumber": "30", "openingBalance": 0.0}, {"id": 31, "accountNumber": "31", "name": "जाधव ओंकार तम्मा", "class": "8 वी", "rollNumber": "31", "openingBalance": 0.0}, {"id": 32, "accountNumber": "32", "name": "पवार अमित दत्ता", "class": "8 वी", "rollNumber": "32", "openingBalance": 0.0}, {"id": 33, "accountNumber": "33", "name": "वरवटे पृथ्वीराज बाळासाहेब", "class": "8 वी", "rollNumber": "33", "openingBalance": 0.0}, {"id": 34, "accountNumber": "34", "name": "कल्लेमुळे  नंदिनी", "class": "9 वी", "rollNumber": "34", "openingBalance": 0.0}, {"id": 35, "accountNumber": "35", "name": "घोडके मोहिनी", "class": "9 वी", "rollNumber": "35", "openingBalance": 0.0}, {"id": 36, "accountNumber": "36", "name": "जमादार राधिका", "class": "9 वी", "rollNumber": "36", "openingBalance": 0.0}, {"id": 37, "accountNumber": "37", "name": "पालमपल्ले पृथ्वीराज", "class": "9 वी", "rollNumber": "37", "openingBalance": 0.0}, {"id": 38, "accountNumber": "38", "name": "मेडेबाने विश्वजित", "class": "8 वी", "rollNumber": "38", "openingBalance": 0.0}, {"id": 39, "accountNumber": "39", "name": "चव्हाण संजय", "class": "9 वी", "rollNumber": "39", "openingBalance": 0.0}, {"id": 40, "accountNumber": "40", "name": "घोडके सुभाष गोविंद", "class": "9 वी", "rollNumber": "40", "openingBalance": 0.0}, {"id": 41, "accountNumber": "41", "name": "दंडगुले युवराज", "class": "9 वी", "rollNumber": "41", "openingBalance": 0.0}, {"id": 42, "accountNumber": "42", "name": "बनसोडे बंडू भास्कर", "class": "9 वी", "rollNumber": "42", "openingBalance": 0.0}, {"id": 43, "accountNumber": "43", "name": "कुरेशी अरमान", "class": "9 वी", "rollNumber": "43", "openingBalance": 0.0}, {"id": 44, "accountNumber": "44", "name": "बरकंबे अभिषेक आनंद", "class": "9 वी", "rollNumber": "44", "openingBalance": 0.0}, {"id": 45, "accountNumber": "45", "name": "यादव साईनाथ", "class": "9 वी", "rollNumber": "45", "openingBalance": 0.0}, {"id": 46, "accountNumber": "46", "name": "गंभिरे प्रविण सिद्धेश्वर", "class": "9 वी", "rollNumber": "46", "openingBalance": 0.0}, {"id": 47, "accountNumber": "47", "name": "मुल्ला अलसफा महमद", "class": "9 वी", "rollNumber": "47", "openingBalance": 0.0}, {"id": 48, "accountNumber": "48", "name": "शेख सीफा समीर", "class": "9 वी", "rollNumber": "48", "openingBalance": 0.0}, {"id": 49, "accountNumber": "49", "name": "जाधव श्रुती विनोद", "class": "9 वी", "rollNumber": "49", "openingBalance": 0.0}, {"id": 50, "accountNumber": "50", "name": "अंश बालाजी आबाचने", "class": "7 वी", "rollNumber": "50", "openingBalance": 0.0}, {"id": 51, "accountNumber": "51", "name": "कृष्णा बालाजी आबाचने", "class": "5  वी", "rollNumber": "51", "openingBalance": 0.0}, {"id": 52, "accountNumber": "52", "name": "आनंद श्रीकृष्ण सौंदर्गे", "class": "7  वी", "rollNumber": "52", "openingBalance": 0.0}, {"id": 53, "accountNumber": "53", "name": "समर्थ बसवराज कोकरे", "class": "5 वी", "rollNumber": "53", "openingBalance": 0.0}, {"id": 54, "accountNumber": "54", "name": "प्रणीत अंबादास कांबळे", "class": "5  वी", "rollNumber": "54", "openingBalance": 0.0}, {"id": 55, "accountNumber": "55", "name": "राज्य यल्लप्पा वजनमकर", "class": "7 वी", "rollNumber": "55", "openingBalance": 0.0}, {"id": 56, "accountNumber": "56", "name": "बालाजी राम जाधव", "class": "7  वी", "rollNumber": "56", "openingBalance": 0.0}, {"id": 57, "accountNumber": "57", "name": "जैद वसिम मुल्ला", "class": "5  वी", "rollNumber": "57", "openingBalance": 0.0}, {"id": 58, "accountNumber": "58", "name": "इस्माईल लाडलेमशाक बागवान", "class": "6  वी", "rollNumber": "58", "openingBalance": 0.0}, {"id": 59, "accountNumber": "59", "name": "ओंकार दत्ता घोडके", "class": "6 वी", "rollNumber": "59", "openingBalance": 0.0}, {"id": 60, "accountNumber": "60", "name": "ज्योती विश्वनाथ राऊत", "class": "5 वी", "rollNumber": "60", "openingBalance": 0.0}, {"id": 61, "accountNumber": "61", "name": "रहेमान लालडेसाब बागवान", "class": "5  वी", "rollNumber": "61", "openingBalance": 0.0}, {"id": 62, "accountNumber": "62", "name": "अमन सलीम लदाफ", "class": "5 वी", "rollNumber": "62", "openingBalance": 0.0}, {"id": 63, "accountNumber": "63", "name": "राज बालाजी मेडेबाने", "class": "7 वी", "rollNumber": "63", "openingBalance": 0.0}, {"id": 64, "accountNumber": "64", "name": "दीपिका जितेंद्र जमादार", "class": "6 वी", "rollNumber": "64", "openingBalance": 0.0}, {"id": 65, "accountNumber": "65", "name": "मुसकान आयुब शेख", "class": "6  वी", "rollNumber": "65", "openingBalance": 0.0}, {"id": 66, "accountNumber": "66", "name": "कृष्णा संतोष वजनम", "class": "9 वी", "rollNumber": "66", "openingBalance": 0.0}, {"id": 67, "accountNumber": "67", "name": "रत्नप्रिया रमेश चलगिरे", "class": "6 वी", "rollNumber": "67", "openingBalance": 0.0}, {"id": 68, "accountNumber": "68", "name": "अफसानद लाडलेमशाक नदाफ", "class": "9 वी", "rollNumber": "68", "openingBalance": 0.0}, {"id": 69, "accountNumber": "69", "name": "आलिया लाडलेमशाक नदाफ", "class": "9 वी", "rollNumber": "69", "openingBalance": 0.0}, {"id": 70, "accountNumber": "70", "name": "गंगा गुंडप्पा वजनमकर", "class": "8 वी", "rollNumber": "70", "openingBalance": 0.0}, {"id": 71, "accountNumber": "71", "name": "श्रावणी दत्त्त घोडके", "class": "8 वी", "rollNumber": "71", "openingBalance": 0.0}, {"id": 72, "accountNumber": "72", "name": "आरूषी संजय साखरे", "class": "8 वी", "rollNumber": "72", "openingBalance": 0.0}, {"id": 73, "accountNumber": "73", "name": "प्रिती ज्ञानेश्वर मेडे", "class": "8 वी", "rollNumber": "73", "openingBalance": 0.0}, {"id": 74, "accountNumber": "74", "name": "अनोखी खंडू एरंडे", "class": "8 वी", "rollNumber": "74", "openingBalance": 0.0}, {"id": 75, "accountNumber": "75", "name": "नागेश यलप्पा पवार", "class": "8 वी", "rollNumber": "75", "openingBalance": 0.0}, {"id": 76, "accountNumber": "76", "name": "अरमान लालडेसाब बागवान", "class": "7 वी", "rollNumber": "76", "openingBalance": 0.0}, {"id": 77, "accountNumber": "77", "name": "‍आदित्य गणेश पवार", "class": "8 वी", "rollNumber": "77", "openingBalance": 0.0}, {"id": 78, "accountNumber": "78", "name": "कलप्पा गणेश पवार", "class": "6 वी", "rollNumber": "78", "openingBalance": 0.0}, {"id": 79, "accountNumber": "79", "name": "भुमिका सुर्यकांत चौधरी", "class": "6 वी", "rollNumber": "79", "openingBalance": 0.0}, {"id": 80, "accountNumber": "80", "name": "आलिया मेहमुद शेख", "class": "6 वी", "rollNumber": "80", "openingBalance": 0.0}, {"id": 81, "accountNumber": "81", "name": "अनुराधा दत्तात्रय कदेरे", "class": "6 वी", "rollNumber": "81", "openingBalance": 0.0}, {"id": 82, "accountNumber": "82", "name": "गणेश भिमा काळे", "class": "6 वी", "rollNumber": "82", "openingBalance": 0.0}, {"id": 83, "accountNumber": "83", "name": "सृष्टी संजय सुर्यवंशी", "class": "6 वी", "rollNumber": "83", "openingBalance": 0.0}, {"id": 84, "accountNumber": "84", "name": "मेघा गणेश अंबुलगे", "class": "6 वी", "rollNumber": "84", "openingBalance": 0.0}, {"id": 85, "accountNumber": "85", "name": "गजरा संजय भंडारे", "class": "6 वी", "rollNumber": "85", "openingBalance": 0.0}, {"id": 86, "accountNumber": "86", "name": "", "class": "", "rollNumber": "86", "openingBalance": 0}, {"id": 87, "accountNumber": "87", "name": "विनायक तिरूपती देवकर", "class": "6 वी", "rollNumber": "87", "openingBalance": 0.0}, {"id": 88, "accountNumber": "88", "name": "गौरी तुळशीराम भोसले", "class": "8 वी", "rollNumber": "88", "openingBalance": 0.0}, {"id": 89, "accountNumber": "89", "name": "श्रुती संतोष माने", "class": "7 वी", "rollNumber": "89", "openingBalance": 0.0}, {"id": 90, "accountNumber": "90", "name": "रूपाली गुंडू मुडे", "class": "8 वी", "rollNumber": "90", "openingBalance": 0.0}, {"id": 91, "accountNumber": "91", "name": "खुशी सचिन शिरसले", "class": "8 वी", "rollNumber": "91", "openingBalance": 0.0}, {"id": 92, "accountNumber": "92", "name": "दत्ता संतोष निंगदळे", "class": "8 वी", "rollNumber": "92", "openingBalance": 0.0}, {"id": 93, "accountNumber": "93", "name": "माधव अशोक अंबुलगे", "class": "6 वी", "rollNumber": "93", "openingBalance": 0.0}, {"id": 94, "accountNumber": "94", "name": "अब्रार तौफिक मुल्ला", "class": "6 वी", "rollNumber": "94", "openingBalance": 0.0}, {"id": 95, "accountNumber": "95", "name": "जोया आशपाक मोमीन", "class": "6 वी", "rollNumber": "95", "openingBalance": 0.0}, {"id": 96, "accountNumber": "96", "name": "साकिब आरीफ हन्नुरे", "class": "6 वी", "rollNumber": "96", "openingBalance": 0.0}, {"id": 97, "accountNumber": "97", "name": "अरसलान सलीम पठाण", "class": "6 वी", "rollNumber": "97", "openingBalance": 0.0}, {"id": 98, "accountNumber": "98", "name": "आहिल सिकंदर नदाफ", "class": "6 वी", "rollNumber": "98", "openingBalance": 0.0}, {"id": 99, "accountNumber": "99", "name": "आयान फेरोज शेख", "class": "6 वी", "rollNumber": "99", "openingBalance": 0.0}, {"id": 100, "accountNumber": "100", "name": "आयेशा इमामअली कबीर", "class": "6 वी", "rollNumber": "100", "openingBalance": 0.0}, {"id": 101, "accountNumber": "101", "name": "रोहन धनराज भोसले", "class": "6 वी", "rollNumber": "101", "openingBalance": 0.0}, {"id": 102, "accountNumber": "102", "name": "पुष्पांजली राजेश माळी", "class": "6 वी", "rollNumber": "102", "openingBalance": 0.0}, {"id": 103, "accountNumber": "103", "name": "वैष्णवी शिवाजी वंगे", "class": "6 वी", "rollNumber": "103", "openingBalance": 0.0}, {"id": 104, "accountNumber": "104", "name": "सुरज त्रिपुरारी पांडे", "class": "6 वी", "rollNumber": "104", "openingBalance": 0.0}, {"id": 105, "accountNumber": "105", "name": "रवी संजय भंडारे", "class": "6 वी", "rollNumber": "105", "openingBalance": 0.0}, {"id": 106, "accountNumber": "106", "name": "सिमरन फकरोद्दीन जमादार", "class": "6 वी", "rollNumber": "106", "openingBalance": 0.0}, {"id": 107, "accountNumber": "107", "name": "आदित्य त्रिपुरारी पांडे", "class": "6 वी", "rollNumber": "107", "openingBalance": 0.0}, {"id": 108, "accountNumber": "108", "name": "", "class": "6 वी", "rollNumber": "108", "openingBalance": 0.0}, {"id": 109, "accountNumber": "109", "name": "", "class": "6 वी", "rollNumber": "109", "openingBalance": 0.0}, {"id": 110, "accountNumber": "110", "name": "", "class": "6 वी", "rollNumber": "110", "openingBalance": 0.0}];
+const EXCEL_TXNS = [{"id": "1_1", "studentId": "1", "date": "2024-04-05", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "1_2", "studentId": "1", "date": "2024-02-06", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "1_3", "studentId": "1", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "1_4", "studentId": "1", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "1_5", "studentId": "1", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "1_6", "studentId": "1", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "1_7", "studentId": "1", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "1_8", "studentId": "1", "date": "2024-02-15", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "1_9", "studentId": "1", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "1_10", "studentId": "1", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "1_11", "studentId": "1", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "1_12", "studentId": "1", "date": "2024-02-29", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "1_13", "studentId": "1", "date": "2024-03-14", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "1_14", "studentId": "1", "date": "2024-07-02", "description": "पुस्तक खरेदी", "type": "withdrawal", "amount": 30.0}, {"id": "1_15", "studentId": "1", "date": "2025-01-28", "description": "खर्च", "type": "withdrawal", "amount": 20.0}, {"id": "1_16", "studentId": "1", "date": "2025-02-01", "description": "खर्च", "type": "withdrawal", "amount": 30.0}, {"id": "1_17", "studentId": "1", "date": "2025-09-12", "description": "Debit", "type": "withdrawal", "amount": 100.0}, {"id": "1_18", "studentId": "1", "date": "", "description": "", "type": "deposit", "amount": 180.0}, {"id": "1_19", "studentId": "1", "date": "", "description": "", "type": "withdrawal", "amount": 180.0}, {"id": "2_1", "studentId": "2", "date": "2024-04-06", "description": "amount received", "type": "deposit", "amount": 10.0}, {"id": "2_2", "studentId": "2", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "2_3", "studentId": "2", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "2_4", "studentId": "2", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "2_5", "studentId": "2", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "2_6", "studentId": "2", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "2_7", "studentId": "2", "date": "2024-02-13", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "2_8", "studentId": "2", "date": "2024-02-15", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "2_9", "studentId": "2", "date": "2025-10-14", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "2_10", "studentId": "2", "date": "2025-01-25", "description": "खर्च", "type": "withdrawal", "amount": 20.0}, {"id": "2_11", "studentId": "2", "date": "2025-01-28", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "2_12", "studentId": "2", "date": "2025-04-15", "description": "खर्च", "type": "withdrawal", "amount": 20.0}, {"id": "2_13", "studentId": "2", "date": "2025-08-14", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "2_14", "studentId": "2", "date": "2025-08-20", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "2_15", "studentId": "2", "date": "2025-09-12", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "2_16", "studentId": "2", "date": "2025-11-27", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "2_17", "studentId": "2", "date": "", "description": "", "type": "deposit", "amount": 190.0}, {"id": "2_18", "studentId": "2", "date": "", "description": "", "type": "withdrawal", "amount": 60.0}, {"id": "3_1", "studentId": "3", "date": "2025-02-18", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "3_2", "studentId": "3", "date": "2024-10-18", "description": "बचत जमा", "type": "deposit", "amount": 250.0}, {"id": "3_3", "studentId": "3", "date": "2024-11-26", "description": "खर्च", "type": "withdrawal", "amount": 50.0}, {"id": "3_4", "studentId": "3", "date": "2024-11-28", "description": "खर्च", "type": "withdrawal", "amount": 50.0}, {"id": "3_5", "studentId": "3", "date": "2024-12-14", "description": "खर्च", "type": "withdrawal", "amount": 100.0}, {"id": "3_6", "studentId": "3", "date": "2024-12-19", "description": "खर्च", "type": "withdrawal", "amount": 50.0}, {"id": "3_7", "studentId": "3", "date": "", "description": "", "type": "deposit", "amount": 260.0}, {"id": "3_8", "studentId": "3", "date": "", "description": "", "type": "withdrawal", "amount": 250.0}, {"id": "4_1", "studentId": "4", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "4_2", "studentId": "4", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "4_3", "studentId": "4", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "4_4", "studentId": "4", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "4_5", "studentId": "4", "date": "2025-08-20", "description": "Credit", "type": "deposit", "amount": 450.0}, {"id": "4_6", "studentId": "4", "date": "2025-09-15", "description": "Credit", "type": "deposit", "amount": 120.0}, {"id": "4_7", "studentId": "4", "date": "2025-04-27", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "4_8", "studentId": "4", "date": "2025-12-03", "description": "debit", "type": "withdrawal", "amount": 210.0}, {"id": "4_9", "studentId": "4", "date": "2026-01-21", "description": "debit", "type": "withdrawal", "amount": 60.0}, {"id": "4_10", "studentId": "4", "date": "", "description": "", "type": "deposit", "amount": 840.0}, {"id": "4_11", "studentId": "4", "date": "", "description": "", "type": "withdrawal", "amount": 70.0}, {"id": "5_1", "studentId": "5", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "5_2", "studentId": "5", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "5_3", "studentId": "5", "date": "2024-08-06", "description": "वही खरेदी", "type": "withdrawal", "amount": 30.0}, {"id": "5_4", "studentId": "5", "date": "", "description": "", "type": "deposit", "amount": 40.0}, {"id": "5_5", "studentId": "5", "date": "", "description": "", "type": "withdrawal", "amount": 30.0}, {"id": "6_1", "studentId": "6", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "6_2", "studentId": "6", "date": "", "description": "", "type": "deposit", "amount": 10.0}, {"id": "7_1", "studentId": "7", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "7_2", "studentId": "7", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "7_3", "studentId": "7", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "7_4", "studentId": "7", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "7_5", "studentId": "7", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "7_6", "studentId": "7", "date": "2024-02-24", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "7_7", "studentId": "7", "date": "2024-07-02", "description": "पुस्तक खरेदी", "type": "withdrawal", "amount": 30.0}, {"id": "7_8", "studentId": "7", "date": "2024-08-20", "description": "उरूस गुंजोटी", "type": "withdrawal", "amount": 80.0}, {"id": "7_9", "studentId": "7", "date": "", "description": "", "type": "deposit", "amount": 130.0}, {"id": "7_10", "studentId": "7", "date": "", "description": "", "type": "withdrawal", "amount": 110.0}, {"id": "8_1", "studentId": "8", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "8_2", "studentId": "8", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "8_3", "studentId": "8", "date": "2024-02-29", "description": "बचत जमा", "type": "deposit", "amount": 60.0}, {"id": "8_4", "studentId": "8", "date": "2024-11-25", "description": "खर्च", "type": "withdrawal", "amount": 80.0}, {"id": "8_5", "studentId": "8", "date": "", "description": "", "type": "deposit", "amount": 90.0}, {"id": "8_6", "studentId": "8", "date": "", "description": "", "type": "withdrawal", "amount": 80.0}, {"id": "9_1", "studentId": "9", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "9_2", "studentId": "9", "date": "", "description": "", "type": "deposit", "amount": 20.0}, {"id": "10_1", "studentId": "10", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "10_2", "studentId": "10", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "10_3", "studentId": "10", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "10_4", "studentId": "10", "date": "2024-02-13", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "10_5", "studentId": "10", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "10_6", "studentId": "10", "date": "2024-02-15", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "10_7", "studentId": "10", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "10_8", "studentId": "10", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 80.0}, {"id": "10_9", "studentId": "10", "date": "2024-02-29", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "10_10", "studentId": "10", "date": "2024-08-07", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "10_11", "studentId": "10", "date": "2024-08-13", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "10_12", "studentId": "10", "date": "2024-11-25", "description": "खर्च", "type": "withdrawal", "amount": 250.0}, {"id": "10_13", "studentId": "10", "date": "", "description": "", "type": "deposit", "amount": 260.0}, {"id": "10_14", "studentId": "10", "date": "", "description": "", "type": "withdrawal", "amount": 250.0}, {"id": "11_1", "studentId": "11", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "11_2", "studentId": "11", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "11_3", "studentId": "11", "date": "", "description": "", "type": "deposit", "amount": 20.0}, {"id": "12_1", "studentId": "12", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "12_2", "studentId": "12", "date": "2024-02-15", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "12_3", "studentId": "12", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "12_4", "studentId": "12", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "12_5", "studentId": "12", "date": "2024-02-29", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "12_6", "studentId": "12", "date": "2024-03-02", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "12_7", "studentId": "12", "date": "", "description": "", "type": "deposit", "amount": 250.0}, {"id": "13_1", "studentId": "13", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "13_2", "studentId": "13", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "13_3", "studentId": "13", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "13_4", "studentId": "13", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "13_5", "studentId": "13", "date": "2025-01-23", "description": "खर्च", "type": "withdrawal", "amount": 30.0}, {"id": "13_6", "studentId": "13", "date": "", "description": "", "type": "deposit", "amount": 40.0}, {"id": "13_7", "studentId": "13", "date": "", "description": "", "type": "withdrawal", "amount": 30.0}, {"id": "14_1", "studentId": "14", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "14_2", "studentId": "14", "date": "2024-12-19", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "14_3", "studentId": "14", "date": "2024-12-20", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "14_4", "studentId": "14", "date": "2025-01-23", "description": "खर्च", "type": "withdrawal", "amount": 50.0}, {"id": "14_5", "studentId": "14", "date": "2025-04-12", "description": "बचत जमा", "type": "deposit", "amount": 500.0}, {"id": "14_6", "studentId": "14", "date": "2025-06-27", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "14_7", "studentId": "14", "date": "2025-07-02", "description": "debit", "type": "withdrawal", "amount": 400.0}, {"id": "14_8", "studentId": "14", "date": "2025-08-06", "description": "credit", "type": "deposit", "amount": 50.0}, {"id": "14_9", "studentId": "14", "date": "2025-08-25", "description": "debit", "type": "withdrawal", "amount": 50.0}, {"id": "14_10", "studentId": "14", "date": "2025-12-22", "description": "credit", "type": "deposit", "amount": 130.0}, {"id": "14_11", "studentId": "14", "date": "2026-02-11", "description": "debit", "type": "withdrawal", "amount": 150.0}, {"id": "14_12", "studentId": "14", "date": "", "description": "", "type": "deposit", "amount": 750.0}, {"id": "14_13", "studentId": "14", "date": "", "description": "", "type": "withdrawal", "amount": 750.0}, {"id": "15_1", "studentId": "15", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "15_2", "studentId": "15", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 70.0}, {"id": "15_3", "studentId": "15", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "15_4", "studentId": "15", "date": "2024-02-24", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "15_5", "studentId": "15", "date": "2025-01-23", "description": "खर्च", "type": "withdrawal", "amount": 50.0}, {"id": "15_6", "studentId": "15", "date": "", "description": "", "type": "deposit", "amount": 200.0}, {"id": "15_7", "studentId": "15", "date": "", "description": "", "type": "withdrawal", "amount": 50.0}, {"id": "16_1", "studentId": "16", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "16_2", "studentId": "16", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "16_3", "studentId": "16", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "16_4", "studentId": "16", "date": "2025-01-23", "description": "खर्च", "type": "withdrawal", "amount": 30.0}, {"id": "16_5", "studentId": "16", "date": "", "description": "", "type": "deposit", "amount": 30.0}, {"id": "16_6", "studentId": "16", "date": "", "description": "", "type": "withdrawal", "amount": 30.0}, {"id": "17_1", "studentId": "17", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "17_2", "studentId": "17", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "17_3", "studentId": "17", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "17_4", "studentId": "17", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "17_5", "studentId": "17", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "17_6", "studentId": "17", "date": "2024-02-29", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "17_7", "studentId": "17", "date": "2025-06-24", "description": "credit", "type": "deposit", "amount": 70.0}, {"id": "17_8", "studentId": "17", "date": "2025-10-07", "description": "credit", "type": "deposit", "amount": 70.0}, {"id": "17_9", "studentId": "17", "date": "", "description": "", "type": "deposit", "amount": 360.0}, {"id": "18_1", "studentId": "18", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "18_2", "studentId": "18", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "18_3", "studentId": "18", "date": "2025-01-23", "description": "खर्च", "type": "withdrawal", "amount": 20.0}, {"id": "18_4", "studentId": "18", "date": "2025-08-06", "description": "credit", "type": "deposit", "amount": 500.0}, {"id": "18_5", "studentId": "18", "date": "2025-09-09", "description": "Debit", "type": "withdrawal", "amount": 200.0}, {"id": "18_6", "studentId": "18", "date": "2025-11-13", "description": "deit", "type": "withdrawal", "amount": 100.0}, {"id": "18_7", "studentId": "18", "date": "2025-11-27", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "18_8", "studentId": "18", "date": "2025-12-04", "description": "debit", "type": "withdrawal", "amount": 50.0}, {"id": "18_9", "studentId": "18", "date": "2025-02-11", "description": "debit", "type": "withdrawal", "amount": 50.0}, {"id": "18_10", "studentId": "18", "date": "", "description": "", "type": "deposit", "amount": 520.0}, {"id": "18_11", "studentId": "18", "date": "", "description": "", "type": "withdrawal", "amount": 520.0}, {"id": "19_1", "studentId": "19", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "19_2", "studentId": "19", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "19_3", "studentId": "19", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "19_4", "studentId": "19", "date": "", "description": "", "type": "deposit", "amount": 30.0}, {"id": "20_1", "studentId": "20", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "20_2", "studentId": "20", "date": "2024-02-15", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "20_3", "studentId": "20", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "20_4", "studentId": "20", "date": "2024-02-06", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "20_5", "studentId": "20", "date": "2024-03-13", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "20_6", "studentId": "20", "date": "2024-03-23", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "20_7", "studentId": "20", "date": "2024-04-10", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "20_8", "studentId": "20", "date": "2024-06-18", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "20_9", "studentId": "20", "date": "2024-06-28", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "20_10", "studentId": "20", "date": "2024-07-08", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "20_11", "studentId": "20", "date": "2024-07-15", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "20_12", "studentId": "20", "date": "2024-08-03", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "20_13", "studentId": "20", "date": "2024-08-06", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "20_14", "studentId": "20", "date": "2024-08-14", "description": "बचत जमा", "type": "deposit", "amount": 60.0}, {"id": "20_15", "studentId": "20", "date": "2024-08-14", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "20_16", "studentId": "20", "date": "2024-09-02", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "20_17", "studentId": "20", "date": "2024-11-25", "description": "खर्च", "type": "withdrawal", "amount": 1130.0}, {"id": "20_18", "studentId": "20", "date": "2025-02-12", "description": "खर्च", "type": "withdrawal", "amount": 10.0}, {"id": "20_19", "studentId": "20", "date": "", "description": "", "type": "deposit", "amount": 1140.0}, {"id": "20_20", "studentId": "20", "date": "", "description": "", "type": "withdrawal", "amount": 1140.0}, {"id": "21_1", "studentId": "21", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "21_2", "studentId": "21", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "21_3", "studentId": "21", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "21_4", "studentId": "21", "date": "2024-03-13", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "21_5", "studentId": "21", "date": "", "description": "", "type": "deposit", "amount": 50.0}, {"id": "31_1", "studentId": "31", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "31_2", "studentId": "31", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_3", "studentId": "31", "date": "2024-02-13", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "31_4", "studentId": "31", "date": "2024-02-04", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "31_5", "studentId": "31", "date": "2024-02-15", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "31_6", "studentId": "31", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "31_7", "studentId": "31", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 70.0}, {"id": "31_8", "studentId": "31", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "31_9", "studentId": "31", "date": "2024-02-27", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_10", "studentId": "31", "date": "2024-02-28", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_11", "studentId": "31", "date": "2024-02-29", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "31_12", "studentId": "31", "date": "2024-03-01", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_13", "studentId": "31", "date": "2024-03-13", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_14", "studentId": "31", "date": "2024-03-14", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "31_15", "studentId": "31", "date": "2024-03-20", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "31_16", "studentId": "31", "date": "2024-04-01", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "31_17", "studentId": "31", "date": "2024-06-24", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_18", "studentId": "31", "date": "2024-07-05", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_19", "studentId": "31", "date": "2024-07-22", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "31_20", "studentId": "31", "date": "2024-08-06", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_21", "studentId": "31", "date": "2024-08-14", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "31_22", "studentId": "31", "date": "2024-08-27", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_23", "studentId": "31", "date": "2024-09-26", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "31_24", "studentId": "31", "date": "2024-10-09", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_25", "studentId": "31", "date": "2024-10-16", "description": "बचत जमा", "type": "deposit", "amount": 90.0}, {"id": "31_26", "studentId": "31", "date": "2024-10-17", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_27", "studentId": "31", "date": "2024-10-18", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_28", "studentId": "31", "date": "2024-10-22", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "31_29", "studentId": "31", "date": "2024-11-26", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "31_30", "studentId": "31", "date": "2024-12-17", "description": "खर्च", "type": "withdrawal", "amount": 500.0}, {"id": "31_31", "studentId": "31", "date": "2024-12-26", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "31_32", "studentId": "31", "date": "2025-12-31", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "31_33", "studentId": "31", "date": "2025-01-04", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "31_34", "studentId": "31", "date": "2025-01-09", "description": "खर्च", "type": "withdrawal", "amount": 120.0}, {"id": "31_35", "studentId": "31", "date": "2025-01-11", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "31_36", "studentId": "31", "date": "2025-01-28", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "31_37", "studentId": "31", "date": "2025-02-11", "description": "खर्च", "type": "withdrawal", "amount": 100.0}, {"id": "31_38", "studentId": "31", "date": "2025-02-14", "description": "बचत जमा", "type": "deposit", "amount": 90.0}, {"id": "31_39", "studentId": "31", "date": "2025-04-21", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "31_40", "studentId": "31", "date": "2025-04-25", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "31_41", "studentId": "31", "date": "2025-06-20", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "31_42", "studentId": "31", "date": "2025-07-14", "description": "debit", "type": "withdrawal", "amount": 660.0}, {"id": "31_43", "studentId": "31", "date": "2025-07-31", "description": "Credit", "type": "deposit", "amount": 690.0}, {"id": "31_44", "studentId": "31", "date": "2025-08-14", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "31_45", "studentId": "31", "date": "2025-09-12", "description": "debit", "type": "withdrawal", "amount": 200.0}, {"id": "31_46", "studentId": "31", "date": "2025-12-15", "description": "Debit", "type": "withdrawal", "amount": 100.0}, {"id": "31_47", "studentId": "31", "date": "2026-01-08", "description": "Credit", "type": "deposit", "amount": 160.0}, {"id": "31_48", "studentId": "31", "date": "2026-01-15", "description": "Credit", "type": "deposit", "amount": 150.0}, {"id": "31_49", "studentId": "31", "date": "2026-01-27", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "31_50", "studentId": "31", "date": "2026-02-05", "description": "Credit", "type": "deposit", "amount": 570.0}, {"id": "31_51", "studentId": "31", "date": "2026-02-11", "description": "Credit", "type": "deposit", "amount": 60.0}, {"id": "31_52", "studentId": "31", "date": "2026-02-16", "description": "Credit", "type": "deposit", "amount": 60.0}, {"id": "31_53", "studentId": "31", "date": "2026-02-28", "description": "Credit", "type": "deposit", "amount": 290.0}, {"id": "31_54", "studentId": "31", "date": "2026-03-10", "description": "Credit", "type": "deposit", "amount": 300.0}, {"id": "31_55", "studentId": "31", "date": "2026-03-14", "description": "Credit", "type": "deposit", "amount": 250.0}, {"id": "22_1", "studentId": "22", "date": "2024-02-13", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "22_2", "studentId": "22", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "22_3", "studentId": "22", "date": "", "description": "", "type": "deposit", "amount": 30.0}, {"id": "23_1", "studentId": "23", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "23_2", "studentId": "23", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "23_3", "studentId": "23", "date": "2024-03-14", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "23_4", "studentId": "23", "date": "2024-07-15", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "23_5", "studentId": "23", "date": "2024-08-14", "description": "बचत जमा", "type": "deposit", "amount": 80.0}, {"id": "23_6", "studentId": "23", "date": "2024-10-26", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "23_7", "studentId": "23", "date": "2024-12-19", "description": "बचत जमा", "type": "deposit", "amount": 220.0}, {"id": "23_8", "studentId": "23", "date": "2025-04-24", "description": "बचत जमा", "type": "deposit", "amount": 410.0}, {"id": "23_9", "studentId": "23", "date": "2025-08-11", "description": "debit", "type": "withdrawal", "amount": 1000.0}, {"id": "23_10", "studentId": "23", "date": "", "description": "", "type": "deposit", "amount": 1020.0}, {"id": "23_11", "studentId": "23", "date": "", "description": "", "type": "withdrawal", "amount": 1000.0}, {"id": "24_1", "studentId": "24", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "24_2", "studentId": "24", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "24_3", "studentId": "24", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "24_4", "studentId": "24", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "24_5", "studentId": "24", "date": "2024-03-13", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "24_6", "studentId": "24", "date": "2024-03-18", "description": "बचत जमा", "type": "deposit", "amount": 300.0}, {"id": "24_7", "studentId": "24", "date": "2024-10-26", "description": "खर्च", "type": "withdrawal", "amount": 100.0}, {"id": "24_8", "studentId": "24", "date": "2025-11-03", "description": "debit", "type": "withdrawal", "amount": 200.0}, {"id": "24_9", "studentId": "24", "date": "", "description": "", "type": "deposit", "amount": 430.0}, {"id": "24_10", "studentId": "24", "date": "", "description": "", "type": "withdrawal", "amount": 300.0}, {"id": "25_1", "studentId": "25", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "25_2", "studentId": "25", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "25_3", "studentId": "25", "date": "", "description": "", "type": "deposit", "amount": 40.0}, {"id": "26_1", "studentId": "26", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "26_2", "studentId": "26", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "26_3", "studentId": "26", "date": "2024-11-25", "description": "बचत जमा", "type": "deposit", "amount": 190.0}, {"id": "26_4", "studentId": "26", "date": "2024-11-26", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "26_5", "studentId": "26", "date": "2024-12-16", "description": "खर्च", "type": "withdrawal", "amount": 20.0}, {"id": "26_6", "studentId": "26", "date": "2025-02-08", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "26_7", "studentId": "26", "date": "2025-08-06", "description": "debit", "type": "withdrawal", "amount": 200.0}, {"id": "26_8", "studentId": "26", "date": "2025-09-08", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "26_9", "studentId": "26", "date": "2025-09-29", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "26_10", "studentId": "26", "date": "", "description": "", "type": "deposit", "amount": 420.0}, {"id": "26_11", "studentId": "26", "date": "", "description": "", "type": "withdrawal", "amount": 420.0}, {"id": "27_1", "studentId": "27", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "27_2", "studentId": "27", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "27_3", "studentId": "27", "date": "2024-08-27", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "27_4", "studentId": "27", "date": "", "description": "", "type": "deposit", "amount": 60.0}, {"id": "28_1", "studentId": "28", "date": "2025-01-13", "description": "बचत जमा", "type": "deposit", "amount": 25.0}, {"id": "28_2", "studentId": "28", "date": "", "description": "", "type": "deposit", "amount": 25.0}, {"id": "29_1", "studentId": "29", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "29_2", "studentId": "29", "date": "", "description": "", "type": "deposit", "amount": 10.0}, {"id": "30_1", "studentId": "30", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "30_2", "studentId": "30", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "30_3", "studentId": "30", "date": "2024-12-28", "description": "खर्च", "type": "withdrawal", "amount": 70.0}, {"id": "30_4", "studentId": "30", "date": "", "description": "credit", "type": "deposit", "amount": 750.0}, {"id": "30_5", "studentId": "30", "date": "2025-11-13", "description": "credit", "type": "deposit", "amount": 1600.0}, {"id": "30_6", "studentId": "30", "date": "2025-11-17", "description": "debit", "type": "withdrawal", "amount": 2000.0}, {"id": "30_7", "studentId": "30", "date": "2025-12-15", "description": "debit", "type": "withdrawal", "amount": 350.0}, {"id": "30_8", "studentId": "30", "date": "", "description": "", "type": "deposit", "amount": 2470.0}, {"id": "30_9", "studentId": "30", "date": "", "description": "", "type": "withdrawal", "amount": 2420.0}, {"id": "32_1", "studentId": "32", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "32_2", "studentId": "32", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "32_3", "studentId": "32", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "32_4", "studentId": "32", "date": "2024-10-22", "description": "कपास", "type": "withdrawal", "amount": 100.0}, {"id": "32_5", "studentId": "32", "date": "", "description": "", "type": "deposit", "amount": 110.0}, {"id": "32_6", "studentId": "32", "date": "", "description": "", "type": "withdrawal", "amount": 100.0}, {"id": "33_1", "studentId": "33", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "33_2", "studentId": "33", "date": "", "description": "", "type": "deposit", "amount": 100.0}, {"id": "34_1", "studentId": "34", "date": "2024-02-06", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "34_2", "studentId": "34", "date": "2024-02-13", "description": "बचत जमा", "type": "deposit", "amount": 120.0}, {"id": "34_3", "studentId": "34", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "34_4", "studentId": "34", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "34_5", "studentId": "34", "date": "2024-02-27", "description": "बचत जमा", "type": "deposit", "amount": 130.0}, {"id": "34_6", "studentId": "34", "date": "2024-03-06", "description": "बचत जमा", "type": "deposit", "amount": 140.0}, {"id": "34_7", "studentId": "34", "date": "2024-07-04", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "34_8", "studentId": "34", "date": "2024-08-21", "description": "चित्रकला परीक्षा फीस", "type": "withdrawal", "amount": 100.0}, {"id": "34_9", "studentId": "34", "date": "2024-10-25", "description": "खर्च", "type": "withdrawal", "amount": 200.0}, {"id": "34_10", "studentId": "34", "date": "2025-08-25", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "34_11", "studentId": "34", "date": "2025-08-26", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "34_12", "studentId": "34", "date": "2025-08-28", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "34_13", "studentId": "34", "date": "2026-02-12", "description": "debit", "type": "withdrawal", "amount": 300.0}, {"id": "34_14", "studentId": "34", "date": "", "description": "", "type": "deposit", "amount": 660.0}, {"id": "34_15", "studentId": "34", "date": "", "description": "", "type": "withdrawal", "amount": 600.0}, {"id": "35_1", "studentId": "35", "date": "2024-02-07", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "35_2", "studentId": "35", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "35_3", "studentId": "35", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_4", "studentId": "35", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 60.0}, {"id": "35_5", "studentId": "35", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 70.0}, {"id": "35_6", "studentId": "35", "date": "2024-02-15", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_7", "studentId": "35", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "35_8", "studentId": "35", "date": "2024-02-21", "description": "बचत जमा", "type": "deposit", "amount": 150.0}, {"id": "35_9", "studentId": "35", "date": "2024-02-23", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_10", "studentId": "35", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 150.0}, {"id": "35_11", "studentId": "35", "date": "2024-02-28", "description": "बचत जमा", "type": "deposit", "amount": 150.0}, {"id": "35_12", "studentId": "35", "date": "2024-02-29", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_13", "studentId": "35", "date": "2024-03-02", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_14", "studentId": "35", "date": "2024-03-06", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_15", "studentId": "35", "date": "2024-03-14", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "35_16", "studentId": "35", "date": "2024-03-16", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_17", "studentId": "35", "date": "2024-03-18", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_18", "studentId": "35", "date": "2024-06-24", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "35_19", "studentId": "35", "date": "2024-06-25", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_20", "studentId": "35", "date": "2024-07-10", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "35_21", "studentId": "35", "date": "2024-07-15", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_22", "studentId": "35", "date": "2024-08-20", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_23", "studentId": "35", "date": "2024-08-21", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_24", "studentId": "35", "date": "2024-08-22", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_25", "studentId": "35", "date": "2024-10-17", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_26", "studentId": "35", "date": "2024-10-18", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_27", "studentId": "35", "date": "2024-10-19", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_28", "studentId": "35", "date": "2024-10-21", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_29", "studentId": "35", "date": "2024-11-26", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_30", "studentId": "35", "date": "2024-12-21", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_31", "studentId": "35", "date": "2025-12-31", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "35_32", "studentId": "35", "date": "2025-01-25", "description": "खर्च", "type": "withdrawal", "amount": 2000.0}, {"id": "35_33", "studentId": "35", "date": "2025-04-04", "description": "खर्च", "type": "withdrawal", "amount": 500.0}, {"id": "35_34", "studentId": "35", "date": "2025-06-23", "description": "credit", "type": "deposit", "amount": 300.0}, {"id": "35_35", "studentId": "35", "date": "2025-07-04", "description": "debit", "type": "withdrawal", "amount": 400.0}, {"id": "35_36", "studentId": "35", "date": "2025-08-07", "description": "debit", "type": "withdrawal", "amount": 200.0}, {"id": "35_37", "studentId": "35", "date": "2025-10-16", "description": "debit", "type": "withdrawal", "amount": 200.0}, {"id": "35_38", "studentId": "35", "date": "", "description": "", "type": "deposit", "amount": 3300.0}, {"id": "35_39", "studentId": "35", "date": "", "description": "", "type": "withdrawal", "amount": 3300.0}, {"id": "36_1", "studentId": "36", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "36_2", "studentId": "36", "date": "2024-02-10", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "36_3", "studentId": "36", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "36_4", "studentId": "36", "date": "2024-02-14", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "36_5", "studentId": "36", "date": "2024-02-15", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "36_6", "studentId": "36", "date": "2024-02-21", "description": "बचत जमा", "type": "deposit", "amount": 60.0}, {"id": "36_7", "studentId": "36", "date": "2024-02-23", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "36_8", "studentId": "36", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "36_9", "studentId": "36", "date": "2024-02-28", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "36_10", "studentId": "36", "date": "2024-02-29", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "36_11", "studentId": "36", "date": "2024-03-06", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "36_12", "studentId": "36", "date": "2024-03-14", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "36_13", "studentId": "36", "date": "2024-03-16", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "36_14", "studentId": "36", "date": "2024-08-20", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "36_15", "studentId": "36", "date": "2024-04-01", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "36_16", "studentId": "36", "date": "2025-09-25", "description": "Debit", "type": "withdrawal", "amount": 650.0}, {"id": "36_17", "studentId": "36", "date": "", "description": "", "type": "deposit", "amount": 660.0}, {"id": "36_18", "studentId": "36", "date": "", "description": "", "type": "withdrawal", "amount": 650.0}, {"id": "39_1", "studentId": "39", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "39_2", "studentId": "39", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "39_3", "studentId": "39", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "39_4", "studentId": "39", "date": "", "description": "", "type": "deposit", "amount": 50.0}, {"id": "40_1", "studentId": "40", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "40_2", "studentId": "40", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "40_3", "studentId": "40", "date": "2024-03-16", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "40_4", "studentId": "40", "date": "2024-04-01", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "40_5", "studentId": "40", "date": "2024-01-24", "description": "बचत जमा", "type": "deposit", "amount": 300.0}, {"id": "40_6", "studentId": "40", "date": "", "description": "", "type": "deposit", "amount": 410.0}, {"id": "42_1", "studentId": "42", "date": "2024-02-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "42_2", "studentId": "42", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "42_3", "studentId": "42", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "42_4", "studentId": "42", "date": "", "description": "", "type": "deposit", "amount": 50.0}, {"id": "44_1", "studentId": "44", "date": "2024-02-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "44_2", "studentId": "44", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "44_3", "studentId": "44", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "44_4", "studentId": "44", "date": "", "description": "", "type": "deposit", "amount": 40.0}, {"id": "45_1", "studentId": "45", "date": "2024-02-13", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "45_2", "studentId": "45", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "45_3", "studentId": "45", "date": "", "description": "", "type": "deposit", "amount": 70.0}, {"id": "46_1", "studentId": "46", "date": "2024-02-12", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "46_2", "studentId": "46", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "46_3", "studentId": "46", "date": "2024-08-22", "description": "चित्रकला फीस", "type": "withdrawal", "amount": 200.0}, {"id": "46_4", "studentId": "46", "date": "", "description": "", "type": "deposit", "amount": 200.0}, {"id": "46_5", "studentId": "46", "date": "", "description": "", "type": "withdrawal", "amount": 200.0}, {"id": "47_1", "studentId": "47", "date": "2024-02-16", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "47_2", "studentId": "47", "date": "2024-02-17", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "47_3", "studentId": "47", "date": "2024-02-20", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "47_4", "studentId": "47", "date": "2024-02-26", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "47_5", "studentId": "47", "date": "2024-02-27", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "47_6", "studentId": "47", "date": "2024-08-21", "description": "चित्रकला परीक्षा फीस", "type": "withdrawal", "amount": 50.0}, {"id": "47_7", "studentId": "47", "date": "", "description": "", "type": "deposit", "amount": 80.0}, {"id": "47_8", "studentId": "47", "date": "", "description": "", "type": "withdrawal", "amount": 50.0}, {"id": "48_1", "studentId": "48", "date": "2024-02-15", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "48_2", "studentId": "48", "date": "2024-02-23", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "48_3", "studentId": "48", "date": "2024-02-29", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "48_4", "studentId": "48", "date": "2024-03-14", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "48_5", "studentId": "48", "date": "2024-07-01", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "48_6", "studentId": "48", "date": "", "description": "", "type": "deposit", "amount": 300.0}, {"id": "49_1", "studentId": "49", "date": "2024-03-06", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "49_2", "studentId": "49", "date": "2024-03-14", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "49_3", "studentId": "49", "date": "2024-03-16", "description": "बचत जमा", "type": "deposit", "amount": 60.0}, {"id": "49_4", "studentId": "49", "date": "2024-03-22", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "49_5", "studentId": "49", "date": "2024-03-23", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "49_6", "studentId": "49", "date": "2024-04-01", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "49_7", "studentId": "49", "date": "2024-06-27", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "49_8", "studentId": "49", "date": "2024-07-06", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "49_9", "studentId": "49", "date": "2024-07-12", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "49_10", "studentId": "49", "date": "2024-09-09", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "49_11", "studentId": "49", "date": "2024-10-26", "description": "खर्च", "type": "withdrawal", "amount": 400.0}, {"id": "49_12", "studentId": "49", "date": "2025-03-06", "description": "खर्च", "type": "withdrawal", "amount": 500.0}, {"id": "49_13", "studentId": "49", "date": "", "description": "", "type": "deposit", "amount": 910.0}, {"id": "49_14", "studentId": "49", "date": "", "description": "", "type": "withdrawal", "amount": 900.0}, {"id": "50_1", "studentId": "50", "date": "2024-08-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "50_2", "studentId": "50", "date": "2024-08-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "50_3", "studentId": "50", "date": "", "description": "", "type": "deposit", "amount": 20.0}, {"id": "51_1", "studentId": "51", "date": "2024-08-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "51_2", "studentId": "51", "date": "2024-08-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "51_3", "studentId": "51", "date": "2024-08-12", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "51_4", "studentId": "51", "date": "2024-08-14", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "51_5", "studentId": "51", "date": "2024-12-23", "description": "खर्च", "type": "withdrawal", "amount": 10.0}, {"id": "51_6", "studentId": "51", "date": "2025-08-08", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "51_7", "studentId": "51", "date": "2025-08-29", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "51_8", "studentId": "51", "date": "2025-09-12", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "51_9", "studentId": "51", "date": "2025-09-29", "description": "debit", "type": "withdrawal", "amount": 60.0}, {"id": "51_10", "studentId": "51", "date": "2025-11-20", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "51_11", "studentId": "51", "date": "2025-11-25", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "51_12", "studentId": "51", "date": "2025-11-26", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "51_13", "studentId": "51", "date": "2025-11-27", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "51_14", "studentId": "51", "date": "2025-12-24", "description": "debit", "type": "withdrawal", "amount": 30.0}, {"id": "51_15", "studentId": "51", "date": "2026-01-01", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "51_16", "studentId": "51", "date": "", "description": "", "type": "deposit", "amount": 250.0}, {"id": "51_17", "studentId": "51", "date": "", "description": "", "type": "withdrawal", "amount": 170.0}, {"id": "52_1", "studentId": "52", "date": "2024-08-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "52_2", "studentId": "52", "date": "2024-08-08", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "52_3", "studentId": "52", "date": "2024-08-12", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "52_4", "studentId": "52", "date": "2024-12-18", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "52_5", "studentId": "52", "date": "2025-01-11", "description": "खर्च", "type": "withdrawal", "amount": 100.0}, {"id": "52_6", "studentId": "52", "date": "2025-08-20", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "52_7", "studentId": "52", "date": "", "description": "", "type": "deposit", "amount": 160.0}, {"id": "52_8", "studentId": "52", "date": "", "description": "", "type": "withdrawal", "amount": 100.0}, {"id": "53_1", "studentId": "53", "date": "2024-08-07", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "53_2", "studentId": "53", "date": "2024-08-15", "description": "बचत जमा", "type": "deposit", "amount": 80.0}, {"id": "53_3", "studentId": "53", "date": "2024-08-26", "description": "चित्रकला फीस", "type": "withdrawal", "amount": 100.0}, {"id": "53_4", "studentId": "53", "date": "", "description": "", "type": "deposit", "amount": 110.0}, {"id": "53_5", "studentId": "53", "date": "", "description": "", "type": "withdrawal", "amount": 100.0}, {"id": "54_1", "studentId": "54", "date": "2024-08-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "54_2", "studentId": "54", "date": "", "description": "", "type": "deposit", "amount": 10.0}, {"id": "55_1", "studentId": "55", "date": "2024-08-08", "description": "बचत जमा", "type": "deposit", "amount": 110.0}, {"id": "55_2", "studentId": "55", "date": "2025-08-07", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "55_3", "studentId": "55", "date": "", "description": "", "type": "deposit", "amount": 110.0}, {"id": "55_4", "studentId": "55", "date": "", "description": "", "type": "withdrawal", "amount": 100.0}, {"id": "56_1", "studentId": "56", "date": "2024-08-08", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "56_2", "studentId": "56", "date": "", "description": "", "type": "deposit", "amount": 20.0}, {"id": "57_1", "studentId": "57", "date": "2024-08-12", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "57_2", "studentId": "57", "date": "2024-08-14", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "57_3", "studentId": "57", "date": "2024-08-15", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "57_4", "studentId": "57", "date": "2025-04-01", "description": "खर्च", "type": "withdrawal", "amount": 10.0}, {"id": "57_5", "studentId": "57", "date": "2025-04-07", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "57_6", "studentId": "57", "date": "2025-07-24", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "57_7", "studentId": "57", "date": "2025-08-25", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "57_8", "studentId": "57", "date": "2025-08-25", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "57_9", "studentId": "57", "date": "2025-08-29", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "57_10", "studentId": "57", "date": "2025-09-10", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "57_11", "studentId": "57", "date": "2025-09-12", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "57_12", "studentId": "57", "date": "2025-09-19", "description": "cr", "type": "deposit", "amount": 80.0}, {"id": "57_13", "studentId": "57", "date": "2025-10-06", "description": "debit", "type": "withdrawal", "amount": 30.0}, {"id": "57_14", "studentId": "57", "date": "2025-11-10", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "57_15", "studentId": "57", "date": "2025-11-13", "description": "debit", "type": "withdrawal", "amount": 40.0}, {"id": "57_16", "studentId": "57", "date": "2025-11-25", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "57_17", "studentId": "57", "date": "", "description": "", "type": "deposit", "amount": 160.0}, {"id": "57_18", "studentId": "57", "date": "", "description": "", "type": "withdrawal", "amount": 150.0}, {"id": "58_1", "studentId": "58", "date": "2024-08-08", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "58_2", "studentId": "58", "date": "2024-08-10", "description": "बचत जमा", "type": "deposit", "amount": 60.0}, {"id": "58_3", "studentId": "58", "date": "2024-08-27", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "58_4", "studentId": "58", "date": "2024-08-30", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "58_5", "studentId": "58", "date": "2024-10-10", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "58_6", "studentId": "58", "date": "2024-10-16", "description": "बचत जमा", "type": "deposit", "amount": 60.0}, {"id": "58_7", "studentId": "58", "date": "2025-02-14", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "58_8", "studentId": "58", "date": "2025-07-01", "description": "credit", "type": "deposit", "amount": 140.0}, {"id": "58_9", "studentId": "58", "date": "2025-08-07", "description": "credit", "type": "deposit", "amount": 100.0}, {"id": "58_10", "studentId": "58", "date": "2025-09-12", "description": "credit", "type": "deposit", "amount": 120.0}, {"id": "58_11", "studentId": "58", "date": "2025-09-15", "description": "credit", "type": "deposit", "amount": 40.0}, {"id": "58_12", "studentId": "58", "date": "2025-09-19", "description": "Debit", "type": "withdrawal", "amount": 150.0}, {"id": "58_13", "studentId": "58", "date": "", "description": "", "type": "deposit", "amount": 690.0}, {"id": "58_14", "studentId": "58", "date": "", "description": "", "type": "withdrawal", "amount": 150.0}, {"id": "59_1", "studentId": "59", "date": "2024-08-08", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "59_2", "studentId": "59", "date": "2024-10-10", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "59_3", "studentId": "59", "date": "2024-10-14", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "59_4", "studentId": "59", "date": "2024-10-16", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "59_5", "studentId": "59", "date": "2024-12-20", "description": "बचत जमा", "type": "deposit", "amount": 190.0}, {"id": "59_6", "studentId": "59", "date": "", "description": "", "type": "deposit", "amount": 200.0}, {"id": "59_7", "studentId": "59", "date": "", "description": "", "type": "withdrawal", "amount": 190.0}, {"id": "60_1", "studentId": "60", "date": "2024-08-12", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "60_2", "studentId": "60", "date": "", "description": "", "type": "deposit", "amount": 10.0}, {"id": "61_1", "studentId": "61", "date": "2024-08-12", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "61_2", "studentId": "61", "date": "2024-08-14", "description": "बचत जमा", "type": "deposit", "amount": 60.0}, {"id": "61_3", "studentId": "61", "date": "2024-08-15", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "61_4", "studentId": "61", "date": "2024-08-21", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "61_5", "studentId": "61", "date": "2024-11-23", "description": "खर्च", "type": "withdrawal", "amount": 20.0}, {"id": "61_6", "studentId": "61", "date": "", "description": "", "type": "deposit", "amount": 120.0}, {"id": "61_7", "studentId": "61", "date": "", "description": "", "type": "withdrawal", "amount": 20.0}, {"id": "62_1", "studentId": "62", "date": "2024-08-14", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "62_2", "studentId": "62", "date": "2024-08-22", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "62_3", "studentId": "62", "date": "2024-08-26", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "62_4", "studentId": "62", "date": "2024-08-27", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "62_5", "studentId": "62", "date": "2024-09-03", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "62_6", "studentId": "62", "date": "2024-09-23", "description": "वहृया खरेदी", "type": "withdrawal", "amount": 80.0}, {"id": "62_7", "studentId": "62", "date": "", "description": "", "type": "deposit", "amount": 90.0}, {"id": "62_8", "studentId": "62", "date": "", "description": "", "type": "withdrawal", "amount": 80.0}, {"id": "63_1", "studentId": "63", "date": "2024-08-20", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "63_2", "studentId": "63", "date": "", "description": "", "type": "deposit", "amount": 10.0}, {"id": "64_1", "studentId": "64", "date": "2024-08-21", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "64_2", "studentId": "64", "date": "2024-08-22", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "64_3", "studentId": "64", "date": "2024-09-23", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "64_4", "studentId": "64", "date": "2024-10-16", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "64_5", "studentId": "64", "date": "2025-04-26", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "64_6", "studentId": "64", "date": "", "description": "", "type": "deposit", "amount": 100.0}, {"id": "64_7", "studentId": "64", "date": "", "description": "", "type": "withdrawal", "amount": 100.0}, {"id": "65_1", "studentId": "65", "date": "2024-08-21", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "65_2", "studentId": "65", "date": "2024-09-23", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "65_3", "studentId": "65", "date": "2024-09-28", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "65_4", "studentId": "65", "date": "2024-10-09", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "65_5", "studentId": "65", "date": "2024-10-10", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "65_6", "studentId": "65", "date": "2024-10-16", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "65_7", "studentId": "65", "date": "2025-01-23", "description": "खर्च", "type": "withdrawal", "amount": 20.0}, {"id": "65_8", "studentId": "65", "date": "2025-09-08", "description": "Debit", "type": "withdrawal", "amount": 20.0}, {"id": "65_9", "studentId": "65", "date": "", "description": "", "type": "deposit", "amount": 110.0}, {"id": "65_10", "studentId": "65", "date": "", "description": "", "type": "withdrawal", "amount": 40.0}, {"id": "66_1", "studentId": "66", "date": "2024-09-02", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "66_2", "studentId": "66", "date": "", "description": "", "type": "deposit", "amount": 20.0}, {"id": "67_1", "studentId": "67", "date": "2024-10-09", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "67_2", "studentId": "67", "date": "2024-10-10", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "67_3", "studentId": "67", "date": "2024-10-11", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "67_4", "studentId": "67", "date": "2024-12-20", "description": "बचत जमा", "type": "deposit", "amount": 110.0}, {"id": "67_5", "studentId": "67", "date": "2024-12-26", "description": "बचत जमा", "type": "deposit", "amount": 250.0}, {"id": "67_6", "studentId": "67", "date": "2025-10-06", "description": "CREDIT", "type": "deposit", "amount": 20.0}, {"id": "67_7", "studentId": "67", "date": "2026-01-29", "description": "debit", "type": "withdrawal", "amount": 200.0}, {"id": "67_8", "studentId": "67", "date": "", "description": "", "type": "deposit", "amount": 420.0}, {"id": "67_9", "studentId": "67", "date": "", "description": "", "type": "withdrawal", "amount": 200.0}, {"id": "68_1", "studentId": "68", "date": "2024-10-18", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "68_2", "studentId": "68", "date": "2024-11-26", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "68_3", "studentId": "68", "date": "2024-12-21", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "68_4", "studentId": "68", "date": "2024-12-24", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "68_5", "studentId": "68", "date": "2025-01-20", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "68_6", "studentId": "68", "date": "2025-01-31", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "68_7", "studentId": "68", "date": "2025-02-14", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "68_8", "studentId": "68", "date": "2025-02-20", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "68_9", "studentId": "68", "date": "2025-06-23", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "68_10", "studentId": "68", "date": "2025-07-04", "description": "debit", "type": "withdrawal", "amount": 400.0}, {"id": "68_11", "studentId": "68", "date": "2025-08-14", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "68_12", "studentId": "68", "date": "2026-01-16", "description": "debit", "type": "withdrawal", "amount": 600.0}, {"id": "68_13", "studentId": "68", "date": "", "description": "", "type": "deposit", "amount": 1150.0}, {"id": "68_14", "studentId": "68", "date": "", "description": "", "type": "withdrawal", "amount": 1000.0}, {"id": "69_1", "studentId": "69", "date": "2024-10-18", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "69_2", "studentId": "69", "date": "2024-12-24", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "69_3", "studentId": "69", "date": "2025-01-09", "description": "बचत जमा", "type": "deposit", "amount": 80.0}, {"id": "69_4", "studentId": "69", "date": "2025-01-15", "description": "खर्च", "type": "withdrawal", "amount": 30.0}, {"id": "69_5", "studentId": "69", "date": "2025-01-20", "description": "बचत जमा", "type": "deposit", "amount": 70.0}, {"id": "69_6", "studentId": "69", "date": "2025-02-01", "description": "बचत जमा", "type": "deposit", "amount": 520.0}, {"id": "69_7", "studentId": "69", "date": "2025-02-14", "description": "बचत जमा", "type": "deposit", "amount": 300.0}, {"id": "69_8", "studentId": "69", "date": "2025-02-17", "description": "खर्च", "type": "withdrawal", "amount": 1000.0}, {"id": "69_9", "studentId": "69", "date": "", "description": "", "type": "deposit", "amount": 1040.0}, {"id": "69_10", "studentId": "69", "date": "", "description": "", "type": "withdrawal", "amount": 1030.0}, {"id": "71_1", "studentId": "71", "date": "2024-10-22", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "71_2", "studentId": "71", "date": "2024-10-26", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "71_3", "studentId": "71", "date": "2024-11-19", "description": "बचत जमा", "type": "deposit", "amount": 120.0}, {"id": "71_4", "studentId": "71", "date": "2024-12-20", "description": "बचत जमा", "type": "deposit", "amount": 190.0}, {"id": "71_5", "studentId": "71", "date": "2024-12-20", "description": "खर्च", "type": "withdrawal", "amount": 125.0}, {"id": "71_6", "studentId": "71", "date": "2025-01-15", "description": "बचत जमा", "type": "deposit", "amount": 25.0}, {"id": "71_7", "studentId": "71", "date": "2025-02-07", "description": "बचत जमा", "type": "deposit", "amount": 30.0}, {"id": "71_8", "studentId": "71", "date": "2025-04-25", "description": "खर्च", "type": "withdrawal", "amount": 250.0}, {"id": "71_9", "studentId": "71", "date": "", "description": "", "type": "deposit", "amount": 385.0}, {"id": "71_10", "studentId": "71", "date": "", "description": "", "type": "withdrawal", "amount": 375.0}, {"id": "72_1", "studentId": "72", "date": "2024-10-22", "description": "बचत जमा", "type": "deposit", "amount": 68.0}, {"id": "72_2", "studentId": "72", "date": "2024-10-24", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "72_3", "studentId": "72", "date": "2024-11-25", "description": "बचत जमा", "type": "deposit", "amount": 200.0}, {"id": "72_4", "studentId": "72", "date": "2025-01-04", "description": "बचत जमा", "type": "deposit", "amount": 120.0}, {"id": "72_5", "studentId": "72", "date": "2025-01-06", "description": "बचत जमा", "type": "deposit", "amount": 92.0}, {"id": "72_6", "studentId": "72", "date": "2025-01-15", "description": "बचत जमा", "type": "deposit", "amount": 130.0}, {"id": "72_7", "studentId": "72", "date": "2025-01-20", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "72_8", "studentId": "72", "date": "2025-01-23", "description": "खर्च", "type": "withdrawal", "amount": 50.0}, {"id": "72_9", "studentId": "72", "date": "2025-01-24", "description": "बचत जमा", "type": "deposit", "amount": 70.0}, {"id": "72_10", "studentId": "72", "date": "2025-02-07", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "72_11", "studentId": "72", "date": "2025-02-10", "description": "बचत जमा", "type": "deposit", "amount": 170.0}, {"id": "72_12", "studentId": "72", "date": "2025-02-20", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "72_13", "studentId": "72", "date": "2025-03-10", "description": "बचत जमा", "type": "deposit", "amount": 120.0}, {"id": "72_14", "studentId": "72", "date": "2025-03-17", "description": "बचत जमा", "type": "deposit", "amount": 120.0}, {"id": "72_15", "studentId": "72", "date": "2025-04-12", "description": "खर्च", "type": "withdrawal", "amount": 500.0}, {"id": "72_16", "studentId": "72", "date": "2025-06-23", "description": "debit", "type": "withdrawal", "amount": 500.0}, {"id": "72_17", "studentId": "72", "date": "2025-07-03", "description": "debit", "type": "withdrawal", "amount": 200.0}, {"id": "72_18", "studentId": "72", "date": "2025-08-05", "description": "credit", "type": "deposit", "amount": 30.0}, {"id": "72_19", "studentId": "72", "date": "2025-08-12", "description": "credit", "type": "deposit", "amount": 230.0}, {"id": "72_20", "studentId": "72", "date": "2025-08-30", "description": "credit", "type": "deposit", "amount": 100.0}, {"id": "72_21", "studentId": "72", "date": "2025-09-06", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "72_22", "studentId": "72", "date": "2025-10-13", "description": "debit", "type": "withdrawal", "amount": 300.0}, {"id": "72_23", "studentId": "72", "date": "", "description": "", "type": "deposit", "amount": 1670.0}, {"id": "72_24", "studentId": "72", "date": "", "description": "", "type": "withdrawal", "amount": 1650.0}, {"id": "73_1", "studentId": "73", "date": "2024-10-22", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "73_2", "studentId": "73", "date": "2024-10-26", "description": "बचत जमा", "type": "deposit", "amount": 15.0}, {"id": "73_3", "studentId": "73", "date": "2025-01-23", "description": "खर्च", "type": "withdrawal", "amount": 20.0}, {"id": "73_4", "studentId": "73", "date": "", "description": "", "type": "deposit", "amount": 25.0}, {"id": "73_5", "studentId": "73", "date": "", "description": "", "type": "withdrawal", "amount": 20.0}, {"id": "74_1", "studentId": "74", "date": "2024-10-18", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "74_2", "studentId": "74", "date": "2025-01-03", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "74_3", "studentId": "74", "date": "2025-01-23", "description": "खर्च", "type": "withdrawal", "amount": 50.0}, {"id": "74_4", "studentId": "74", "date": "2025-06-27", "description": "debit", "type": "withdrawal", "amount": 50.0}, {"id": "74_5", "studentId": "74", "date": "2025-08-11", "description": "credit", "type": "deposit", "amount": 250.0}, {"id": "74_6", "studentId": "74", "date": "2025-08-25", "description": "debit", "type": "withdrawal", "amount": 200.0}, {"id": "74_7", "studentId": "74", "date": "2025-08-29", "description": "credit", "type": "deposit", "amount": 100.0}, {"id": "74_8", "studentId": "74", "date": "2025-09-10", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "74_9", "studentId": "74", "date": "", "description": "", "type": "deposit", "amount": 460.0}, {"id": "74_10", "studentId": "74", "date": "", "description": "", "type": "withdrawal", "amount": 400.0}, {"id": "75_1", "studentId": "75", "date": "2024-12-21", "description": "बचत जमा", "type": "deposit", "amount": 210.0}, {"id": "75_2", "studentId": "75", "date": "2024-12-26", "description": "बचत जमा", "type": "deposit", "amount": 300.0}, {"id": "75_3", "studentId": "75", "date": "2024-12-28", "description": "खर्च", "type": "withdrawal", "amount": 500.0}, {"id": "75_4", "studentId": "75", "date": "2025-01-06", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "75_5", "studentId": "75", "date": "2025-01-09", "description": "खर्च", "type": "withdrawal", "amount": 30.0}, {"id": "75_6", "studentId": "75", "date": "", "description": "", "type": "deposit", "amount": 550.0}, {"id": "75_7", "studentId": "75", "date": "", "description": "", "type": "withdrawal", "amount": 530.0}, {"id": "76_1", "studentId": "76", "date": "2024-12-23", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "76_2", "studentId": "76", "date": "2024-12-24", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "76_3", "studentId": "76", "date": "2025-01-01", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "76_4", "studentId": "76", "date": "2025-01-04", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "76_5", "studentId": "76", "date": "2025-01-09", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "76_6", "studentId": "76", "date": "2025-01-15", "description": "खर्च", "type": "withdrawal", "amount": 10.0}, {"id": "76_7", "studentId": "76", "date": "2025-02-05", "description": "खर्च", "type": "withdrawal", "amount": 50.0}, {"id": "76_8", "studentId": "76", "date": "2025-12-03", "description": "credit", "type": "deposit", "amount": 50.0}, {"id": "76_9", "studentId": "76", "date": "", "description": "", "type": "deposit", "amount": 160.0}, {"id": "76_10", "studentId": "76", "date": "", "description": "", "type": "withdrawal", "amount": 60.0}, {"id": "77_1", "studentId": "77", "date": "2024-12-26", "description": "बचत जमा", "type": "deposit", "amount": 20.0}, {"id": "77_2", "studentId": "77", "date": "2024-12-28", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "77_3", "studentId": "77", "date": "2025-01-02", "description": "बचत जमा", "type": "deposit", "amount": 70.0}, {"id": "77_4", "studentId": "77", "date": "2025-01-03", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "77_5", "studentId": "77", "date": "2025-01-04", "description": "बचत जमा", "type": "deposit", "amount": 25.0}, {"id": "77_6", "studentId": "77", "date": "2025-01-06", "description": "बचत जमा", "type": "deposit", "amount": 50.0}, {"id": "77_7", "studentId": "77", "date": "2025-02-07", "description": "बचत जमा", "type": "deposit", "amount": 300.0}, {"id": "77_8", "studentId": "77", "date": "2025-04-25", "description": "खर्च", "type": "withdrawal", "amount": 600.0}, {"id": "77_9", "studentId": "77", "date": "", "description": "", "type": "deposit", "amount": 615.0}, {"id": "77_10", "studentId": "77", "date": "", "description": "", "type": "withdrawal", "amount": 600.0}, {"id": "78_1", "studentId": "78", "date": "2024-12-28", "description": "बचत जमा", "type": "deposit", "amount": 10.0}, {"id": "78_2", "studentId": "78", "date": "2025-01-01", "description": "बचत जमा", "type": "deposit", "amount": 40.0}, {"id": "78_3", "studentId": "78", "date": "2025-01-03", "description": "बचत जमा", "type": "deposit", "amount": 100.0}, {"id": "78_4", "studentId": "78", "date": "2025-01-04", "description": "बचत जमा", "type": "deposit", "amount": 25.0}, {"id": "78_5", "studentId": "78", "date": "2025-02-07", "description": "बचत जमा", "type": "deposit", "amount": 500.0}, {"id": "78_6", "studentId": "78", "date": "2025-07-01", "description": "debit", "type": "withdrawal", "amount": 600.0}, {"id": "78_7", "studentId": "78", "date": "2025-09-08", "description": "Credit", "type": "deposit", "amount": 70.0}, {"id": "78_8", "studentId": "78", "date": "2025-09-09", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "78_9", "studentId": "78", "date": "2025-09-15", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "78_10", "studentId": "78", "date": "2025-10-06", "description": "debit", "type": "withdrawal", "amount": 65.0}, {"id": "78_11", "studentId": "78", "date": "2025-11-27", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "78_12", "studentId": "78", "date": "", "description": "", "type": "deposit", "amount": 865.0}, {"id": "78_13", "studentId": "78", "date": "", "description": "", "type": "withdrawal", "amount": 765.0}, {"id": "79_1", "studentId": "79", "date": "2025-08-05", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "79_2", "studentId": "79", "date": "2025-08-06", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "79_3", "studentId": "79", "date": "2025-10-06", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "79_4", "studentId": "79", "date": "2026-01-01", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "79_5", "studentId": "79", "date": "", "description": "", "type": "deposit", "amount": 80.0}, {"id": "79_6", "studentId": "79", "date": "", "description": "", "type": "withdrawal", "amount": 10.0}, {"id": "80_1", "studentId": "80", "date": "2025-08-05", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "80_2", "studentId": "80", "date": "2025-08-06", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "80_3", "studentId": "80", "date": "2025-08-08", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "80_4", "studentId": "80", "date": "2025-08-20", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "80_5", "studentId": "80", "date": "2025-08-21", "description": "credit", "type": "deposit", "amount": 30.0}, {"id": "80_6", "studentId": "80", "date": "2025-08-25", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "80_7", "studentId": "80", "date": "2025-08-29", "description": "Debit", "type": "withdrawal", "amount": 10.0}, {"id": "80_8", "studentId": "80", "date": "2025-09-19", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "80_9", "studentId": "80", "date": "2025-09-29", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "80_10", "studentId": "80", "date": "2025-10-06", "description": "Debit", "type": "withdrawal", "amount": 10.0}, {"id": "80_11", "studentId": "80", "date": "2025-11-10", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "80_12", "studentId": "80", "date": "2025-11-13", "description": "credit", "type": "deposit", "amount": 110.0}, {"id": "80_13", "studentId": "80", "date": "2025-01-25", "description": "credit", "type": "deposit", "amount": 40.0}, {"id": "80_14", "studentId": "80", "date": "2025-12-24", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "80_15", "studentId": "80", "date": "", "description": "", "type": "deposit", "amount": 290.0}, {"id": "80_16", "studentId": "80", "date": "", "description": "", "type": "withdrawal", "amount": 30.0}, {"id": "81_1", "studentId": "81", "date": "2025-08-06", "description": "credit", "type": "deposit", "amount": 15.0}, {"id": "81_2", "studentId": "81", "date": "", "description": "", "type": "deposit", "amount": 15.0}, {"id": "82_1", "studentId": "82", "date": "2025-08-06", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "82_2", "studentId": "82", "date": "2025-08-07", "description": "credit", "type": "deposit", "amount": 40.0}, {"id": "82_3", "studentId": "82", "date": "2025-08-07", "description": "credit", "type": "deposit", "amount": 50.0}, {"id": "82_4", "studentId": "82", "date": "2025-08-11", "description": "credit", "type": "deposit", "amount": 100.0}, {"id": "82_5", "studentId": "82", "date": "2025-08-14", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "82_6", "studentId": "82", "date": "2025-08-19", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "82_7", "studentId": "82", "date": "2025-09-02", "description": "debit", "type": "withdrawal", "amount": 150.0}, {"id": "82_8", "studentId": "82", "date": "", "description": "", "type": "deposit", "amount": 240.0}, {"id": "82_9", "studentId": "82", "date": "", "description": "", "type": "withdrawal", "amount": 150.0}, {"id": "83_1", "studentId": "83", "date": "2025-08-06", "description": "credit", "type": "deposit", "amount": 50.0}, {"id": "83_2", "studentId": "83", "date": "", "description": "", "type": "deposit", "amount": 50.0}, {"id": "84_1", "studentId": "84", "date": "2025-08-07", "description": "credit", "type": "deposit", "amount": 25.0}, {"id": "84_2", "studentId": "84", "date": "2025-08-08", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "84_3", "studentId": "84", "date": "2025-08-11", "description": "credit", "type": "deposit", "amount": 100.0}, {"id": "84_4", "studentId": "84", "date": "2025-08-12", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "84_5", "studentId": "84", "date": "2025-08-26", "description": "credit", "type": "deposit", "amount": 15.0}, {"id": "84_6", "studentId": "84", "date": "2025-08-28", "description": "credit", "type": "deposit", "amount": 400.0}, {"id": "84_7", "studentId": "84", "date": "2025-09-12", "description": "Debit", "type": "withdrawal", "amount": 200.0}, {"id": "84_8", "studentId": "84", "date": "2025-09-12", "description": "Debit", "type": "withdrawal", "amount": 200.0}, {"id": "84_9", "studentId": "84", "date": "2025-11-15", "description": "credit", "type": "deposit", "amount": 40.0}, {"id": "84_10", "studentId": "84", "date": "2025-11-19", "description": "credit", "type": "deposit", "amount": 300.0}, {"id": "84_11", "studentId": "84", "date": "2025-11-27", "description": "Debit", "type": "withdrawal", "amount": 20.0}, {"id": "84_12", "studentId": "84", "date": "2026-01-01", "description": "Debit", "type": "withdrawal", "amount": 200.0}, {"id": "84_13", "studentId": "84", "date": "", "description": "", "type": "deposit", "amount": 920.0}, {"id": "84_14", "studentId": "84", "date": "", "description": "", "type": "withdrawal", "amount": 620.0}, {"id": "85_1", "studentId": "85", "date": "2025-08-07", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "85_2", "studentId": "85", "date": "2025-08-08", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "85_3", "studentId": "85", "date": "2025-08-14", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "85_4", "studentId": "85", "date": "2025-08-20", "description": "credit", "type": "deposit", "amount": 15.0}, {"id": "85_5", "studentId": "85", "date": "2025-08-29", "description": "credit", "type": "deposit", "amount": 15.0}, {"id": "85_6", "studentId": "85", "date": "2025-09-02", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "85_7", "studentId": "85", "date": "2025-09-03", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "85_8", "studentId": "85", "date": "2025-09-08", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "85_9", "studentId": "85", "date": "2025-09-09", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "85_10", "studentId": "85", "date": "2025-09-12", "description": "Crd", "type": "deposit", "amount": 20.0}, {"id": "85_11", "studentId": "85", "date": "2025-09-29", "description": "DEBIT", "type": "withdrawal", "amount": 10.0}, {"id": "85_12", "studentId": "85", "date": "2025-09-30", "description": "DEBIT", "type": "withdrawal", "amount": 50.0}, {"id": "85_13", "studentId": "85", "date": "2025-11-17", "description": "DEBIT", "type": "withdrawal", "amount": 10.0}, {"id": "85_14", "studentId": "85", "date": "2025-11-27", "description": "debit", "type": "withdrawal", "amount": 40.0}, {"id": "85_15", "studentId": "85", "date": "", "description": "", "type": "deposit", "amount": 130.0}, {"id": "85_16", "studentId": "85", "date": "", "description": "", "type": "withdrawal", "amount": 110.0}, {"id": "86_1", "studentId": "86", "date": "", "description": "", "type": "deposit", "amount": 3.0}, {"id": "86_2", "studentId": "86", "date": "2025-08-08", "description": "credit", "type": "deposit", "amount": 25.0}, {"id": "86_3", "studentId": "86", "date": "", "description": "", "type": "deposit", "amount": 25.0}, {"id": "87_1", "studentId": "87", "date": "2025-08-11", "description": "credit", "type": "deposit", "amount": 70.0}, {"id": "87_2", "studentId": "87", "date": "2025-08-12", "description": "credit", "type": "deposit", "amount": 130.0}, {"id": "87_3", "studentId": "87", "date": "2025-08-23", "description": "credit", "type": "deposit", "amount": 40.0}, {"id": "87_4", "studentId": "87", "date": "2025-08-14", "description": "debit", "type": "withdrawal", "amount": 40.0}, {"id": "87_5", "studentId": "87", "date": "2025-09-09", "description": "credit", "type": "deposit", "amount": 50.0}, {"id": "87_6", "studentId": "87", "date": "2025-09-11", "description": "Debit", "type": "withdrawal", "amount": 50.0}, {"id": "87_7", "studentId": "87", "date": "2025-09-18", "description": "Debit", "type": "withdrawal", "amount": 200.0}, {"id": "87_8", "studentId": "87", "date": "", "description": "", "type": "deposit", "amount": 290.0}, {"id": "87_9", "studentId": "87", "date": "", "description": "", "type": "withdrawal", "amount": 290.0}, {"id": "88_1", "studentId": "88", "date": "2025-08-12", "description": "credit", "type": "deposit", "amount": 30.0}, {"id": "88_2", "studentId": "88", "date": "2025-08-14", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "88_3", "studentId": "88", "date": "2025-08-19", "description": "credit", "type": "deposit", "amount": 30.0}, {"id": "88_4", "studentId": "88", "date": "2025-08-20", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "88_5", "studentId": "88", "date": "2025-08-26", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "88_6", "studentId": "88", "date": "2025-08-28", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "88_7", "studentId": "88", "date": "2025-10-04", "description": "credit", "type": "deposit", "amount": 30.0}, {"id": "88_8", "studentId": "88", "date": "2025-11-27", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "88_9", "studentId": "88", "date": "2025-11-27", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "88_10", "studentId": "88", "date": "", "description": "", "type": "deposit", "amount": 130.0}, {"id": "88_11", "studentId": "88", "date": "", "description": "", "type": "withdrawal", "amount": 40.0}, {"id": "89_1", "studentId": "89", "date": "2025-08-12", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "89_2", "studentId": "89", "date": "2025-08-13", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "89_3", "studentId": "89", "date": "2025-08-14", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "89_4", "studentId": "89", "date": "2025-08-20", "description": "credit", "type": "deposit", "amount": 10.0}, {"id": "89_5", "studentId": "89", "date": "2025-09-09", "description": "credit", "type": "deposit", "amount": 30.0}, {"id": "89_6", "studentId": "89", "date": "2025-10-06", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "89_7", "studentId": "89", "date": "2025-10-16", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "89_8", "studentId": "89", "date": "", "description": "", "type": "deposit", "amount": 120.0}, {"id": "89_9", "studentId": "89", "date": "", "description": "", "type": "withdrawal", "amount": 100.0}, {"id": "90_1", "studentId": "90", "date": "2025-08-13", "description": "credit", "type": "deposit", "amount": 120.0}, {"id": "90_2", "studentId": "90", "date": "2025-08-19", "description": "crebit", "type": "deposit", "amount": 20.0}, {"id": "90_3", "studentId": "90", "date": "2025-08-26", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "90_4", "studentId": "90", "date": "2025-09-09", "description": "Debit", "type": "withdrawal", "amount": 50.0}, {"id": "90_5", "studentId": "90", "date": "2025-10-15", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "90_6", "studentId": "90", "date": "2026-01-01", "description": "debit", "type": "withdrawal", "amount": 30.0}, {"id": "90_7", "studentId": "90", "date": "2026-01-08", "description": "debit", "type": "withdrawal", "amount": 15.0}, {"id": "90_8", "studentId": "90", "date": "2026-01-21", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "90_9", "studentId": "90", "date": "", "description": "", "type": "deposit", "amount": 140.0}, {"id": "90_10", "studentId": "90", "date": "", "description": "", "type": "withdrawal", "amount": 135.0}, {"id": "91_1", "studentId": "91", "date": "2025-08-19", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "91_2", "studentId": "91", "date": "2025-08-26", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "91_3", "studentId": "91", "date": "2025-09-02", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "91_4", "studentId": "91", "date": "2025-09-08", "description": "Credit", "type": "deposit", "amount": 55.0}, {"id": "91_5", "studentId": "91", "date": "2025-09-12", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "91_6", "studentId": "91", "date": "2025-10-11", "description": "debit", "type": "withdrawal", "amount": 120.0}, {"id": "91_7", "studentId": "91", "date": "2026-01-01", "description": "debit", "type": "withdrawal", "amount": 30.0}, {"id": "91_8", "studentId": "91", "date": "2026-01-08", "description": "debit", "type": "withdrawal", "amount": 5.0}, {"id": "91_9", "studentId": "91", "date": "", "description": "", "type": "deposit", "amount": 155.0}, {"id": "91_10", "studentId": "91", "date": "", "description": "", "type": "withdrawal", "amount": 155.0}, {"id": "92_1", "studentId": "92", "date": "2025-08-20", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "92_2", "studentId": "92", "date": "2025-09-02", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "92_3", "studentId": "92", "date": "2025-09-08", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "92_4", "studentId": "92", "date": "", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "92_5", "studentId": "92", "date": "2025-11-20", "description": "Credit", "type": "deposit", "amount": 40.0}, {"id": "92_6", "studentId": "92", "date": "", "description": "", "type": "deposit", "amount": 130.0}, {"id": "93_1", "studentId": "93", "date": "2025-08-29", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "93_2", "studentId": "93", "date": "2025-10-06", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "93_3", "studentId": "93", "date": "2025-11-10", "description": "credit", "type": "deposit", "amount": 90.0}, {"id": "93_4", "studentId": "93", "date": "2025-11-13", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "93_5", "studentId": "93", "date": "2025-11-20", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "93_6", "studentId": "93", "date": "2025-11-26", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "93_7", "studentId": "93", "date": "2025-11-27", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "93_8", "studentId": "93", "date": "2025-12-05", "description": "credit", "type": "deposit", "amount": 130.0}, {"id": "93_9", "studentId": "93", "date": "2025-12-15", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "93_10", "studentId": "93", "date": "2025-12-24", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "93_11", "studentId": "93", "date": "2026-01-01", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "93_12", "studentId": "93", "date": "", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "93_13", "studentId": "93", "date": "2026-01-20", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "93_14", "studentId": "93", "date": "2026-02-09", "description": "credit", "type": "deposit", "amount": 160.0}, {"id": "93_15", "studentId": "93", "date": "", "description": "", "type": "deposit", "amount": 450.0}, {"id": "93_16", "studentId": "93", "date": "", "description": "", "type": "withdrawal", "amount": 140.0}, {"id": "94_1", "studentId": "94", "date": "2025-08-30", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "94_2", "studentId": "94", "date": "2025-08-02", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "94_3", "studentId": "94", "date": "2025-09-10", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "94_4", "studentId": "94", "date": "2025-09-19", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "94_5", "studentId": "94", "date": "2025-09-29", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "94_6", "studentId": "94", "date": "", "description": "", "type": "deposit", "amount": 100.0}, {"id": "95_1", "studentId": "95", "date": "2025-08-30", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "95_2", "studentId": "95", "date": "2025-09-15", "description": "Credit", "type": "deposit", "amount": 15.0}, {"id": "95_3", "studentId": "95", "date": "2025-09-19", "description": "Credit", "type": "deposit", "amount": 35.0}, {"id": "95_4", "studentId": "95", "date": "2025-09-26", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "95_5", "studentId": "95", "date": "2025-10-04", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "95_6", "studentId": "95", "date": "2025-11-27", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "95_7", "studentId": "95", "date": "", "description": "", "type": "deposit", "amount": 150.0}, {"id": "95_8", "studentId": "95", "date": "", "description": "", "type": "withdrawal", "amount": 120.0}, {"id": "96_1", "studentId": "96", "date": "2025-08-30", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "96_2", "studentId": "96", "date": "2025-08-02", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "96_3", "studentId": "96", "date": "2025-09-12", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "96_4", "studentId": "96", "date": "2025-09-15", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "96_5", "studentId": "96", "date": "2025-09-19", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "96_6", "studentId": "96", "date": "2025-09-29", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "96_7", "studentId": "96", "date": "2025-10-03", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "96_8", "studentId": "96", "date": "2025-10-06", "description": "Credit", "type": "deposit", "amount": 40.0}, {"id": "96_9", "studentId": "96", "date": "2025-11-14", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "96_10", "studentId": "96", "date": "2025-11-18", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "96_11", "studentId": "96", "date": "2025-11-21", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "96_12", "studentId": "96", "date": "", "description": "", "type": "deposit", "amount": 520.0}, {"id": "97_1", "studentId": "97", "date": "2025-08-30", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "97_2", "studentId": "97", "date": "2025-09-02", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "97_3", "studentId": "97", "date": "", "description": "", "type": "deposit", "amount": 20.0}, {"id": "98_1", "studentId": "98", "date": "2025-09-02", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "98_2", "studentId": "98", "date": "2025-09-05", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "98_3", "studentId": "98", "date": "2025-09-10", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "98_4", "studentId": "98", "date": "2025-09-11", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "98_5", "studentId": "98", "date": "2025-09-19", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "98_6", "studentId": "98", "date": "2025-10-03", "description": "DEBIT", "type": "withdrawal", "amount": 20.0}, {"id": "98_7", "studentId": "98", "date": "2025-10-04", "description": "DEBIT", "type": "withdrawal", "amount": 20.0}, {"id": "98_8", "studentId": "98", "date": "", "description": "", "type": "deposit", "amount": 60.0}, {"id": "98_9", "studentId": "98", "date": "", "description": "", "type": "withdrawal", "amount": 40.0}, {"id": "99_1", "studentId": "99", "date": "2025-09-02", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "99_2", "studentId": "99", "date": "2025-09-03", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "99_3", "studentId": "99", "date": "2025-09-06", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "99_4", "studentId": "99", "date": "2025-09-09", "description": "Debit", "type": "withdrawal", "amount": 10.0}, {"id": "99_5", "studentId": "99", "date": "2025-09-19", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "99_6", "studentId": "99", "date": "2025-10-06", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "99_7", "studentId": "99", "date": "2025-11-10", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "99_8", "studentId": "99", "date": "2025-11-20", "description": "debit", "type": "withdrawal", "amount": 10.0}, {"id": "99_9", "studentId": "99", "date": "2025-11-27", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "99_10", "studentId": "99", "date": "", "description": "", "type": "deposit", "amount": 50.0}, {"id": "99_11", "studentId": "99", "date": "", "description": "", "type": "withdrawal", "amount": 50.0}, {"id": "100_1", "studentId": "100", "date": "2025-09-08", "description": "Credit", "type": "deposit", "amount": 15.0}, {"id": "100_2", "studentId": "100", "date": "2025-09-09", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "100_3", "studentId": "100", "date": "2025-09-11", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "100_4", "studentId": "100", "date": "2025-09-12", "description": "Credit", "type": "deposit", "amount": 25.0}, {"id": "100_5", "studentId": "100", "date": "2025-09-15", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "100_6", "studentId": "100", "date": "2025-09-19", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "100_7", "studentId": "100", "date": "2025-09-29", "description": "DEBIT", "type": "withdrawal", "amount": 10.0}, {"id": "100_8", "studentId": "100", "date": "2025-10-03", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "100_9", "studentId": "100", "date": "2025-10-09", "description": "DEBIT", "type": "withdrawal", "amount": 20.0}, {"id": "100_10", "studentId": "100", "date": "2025-11-04", "description": "debit", "type": "withdrawal", "amount": 50.0}, {"id": "100_11", "studentId": "100", "date": "2025-11-17", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "100_12", "studentId": "100", "date": "2025-11-26", "description": "debit", "type": "withdrawal", "amount": 70.0}, {"id": "100_13", "studentId": "100", "date": "", "description": "", "type": "deposit", "amount": 170.0}, {"id": "100_14", "studentId": "100", "date": "", "description": "", "type": "withdrawal", "amount": 170.0}, {"id": "101_1", "studentId": "101", "date": "2025-09-08", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "101_2", "studentId": "101", "date": "2025-09-25", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "101_3", "studentId": "101", "date": "2025-10-06", "description": "Credit", "type": "deposit", "amount": 30.0}, {"id": "101_4", "studentId": "101", "date": "2025-11-10", "description": "debit", "type": "withdrawal", "amount": 70.0}, {"id": "101_5", "studentId": "101", "date": "", "description": "", "type": "deposit", "amount": 90.0}, {"id": "101_6", "studentId": "101", "date": "", "description": "", "type": "withdrawal", "amount": 70.0}, {"id": "102_1", "studentId": "102", "date": "2025-09-09", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "102_2", "studentId": "102", "date": "2025-09-10", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "102_3", "studentId": "102", "date": "2025-09-11", "description": "Credit", "type": "deposit", "amount": 30.0}, {"id": "102_4", "studentId": "102", "date": "2025-09-12", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "102_5", "studentId": "102", "date": "2025-09-19", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "102_6", "studentId": "102", "date": "2025-10-06", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "102_7", "studentId": "102", "date": "2025-11-10", "description": "Credit", "type": "deposit", "amount": 100.0}, {"id": "102_8", "studentId": "102", "date": "", "description": "", "type": "deposit", "amount": 350.0}, {"id": "103_1", "studentId": "103", "date": "2025-09-11", "description": "Credit", "type": "deposit", "amount": 30.0}, {"id": "103_2", "studentId": "103", "date": "2025-09-19", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "103_3", "studentId": "103", "date": "2025-09-29", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "103_4", "studentId": "103", "date": "2025-10-03", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "103_5", "studentId": "103", "date": "2025-10-13", "description": "Credit", "type": "deposit", "amount": 25.0}, {"id": "103_6", "studentId": "103", "date": "2025-11-10", "description": "credit", "type": "deposit", "amount": 20.0}, {"id": "103_7", "studentId": "103", "date": "", "description": "", "type": "deposit", "amount": 155.0}, {"id": "104_1", "studentId": "104", "date": "2025-09-15", "description": "Credit", "type": "deposit", "amount": 45.0}, {"id": "104_2", "studentId": "104", "date": "2025-10-03", "description": "Credit", "type": "deposit", "amount": 40.0}, {"id": "104_3", "studentId": "104", "date": "2025-10-13", "description": "Credit", "type": "deposit", "amount": 20.0}, {"id": "104_4", "studentId": "104", "date": "2025-10-16", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "104_5", "studentId": "104", "date": "2026-02-16", "description": "Credit", "type": "deposit", "amount": 200.0}, {"id": "104_6", "studentId": "104", "date": "2026-02-18", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "104_7", "studentId": "104", "date": "2026-02-23", "description": "debit", "type": "withdrawal", "amount": 100.0}, {"id": "104_8", "studentId": "104", "date": "", "description": "", "type": "deposit", "amount": 305.0}, {"id": "104_9", "studentId": "104", "date": "", "description": "", "type": "withdrawal", "amount": 300.0}, {"id": "105_1", "studentId": "105", "date": "2025-09-12", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "105_2", "studentId": "105", "date": "", "description": "", "type": "deposit", "amount": 10.0}, {"id": "106_1", "studentId": "106", "date": "2025-09-19", "description": "Credit", "type": "deposit", "amount": 10.0}, {"id": "106_2", "studentId": "106", "date": "2025-09-29", "description": "Credit", "type": "deposit", "amount": 50.0}, {"id": "106_3", "studentId": "106", "date": "2025-10-03", "description": "Credit", "type": "deposit", "amount": 40.0}, {"id": "106_4", "studentId": "106", "date": "2025-10-04", "description": "DEBIT", "type": "withdrawal", "amount": 20.0}, {"id": "106_5", "studentId": "106", "date": "2025-10-13", "description": "Credit", "type": "deposit", "amount": 15.0}, {"id": "106_6", "studentId": "106", "date": "2026-01-10", "description": "DEBIT", "type": "withdrawal", "amount": 20.0}, {"id": "106_7", "studentId": "106", "date": "2026-01-21", "description": "DEBIT", "type": "withdrawal", "amount": 60.0}, {"id": "106_8", "studentId": "106", "date": "", "description": "", "type": "deposit", "amount": 115.0}, {"id": "106_9", "studentId": "106", "date": "", "description": "", "type": "withdrawal", "amount": 100.0}, {"id": "107_1", "studentId": "107", "date": "2025-11-11", "description": "credit", "type": "deposit", "amount": 320.0}, {"id": "107_2", "studentId": "107", "date": "2025-11-21", "description": "debit", "type": "withdrawal", "amount": 20.0}, {"id": "107_3", "studentId": "107", "date": "2025-12-05", "description": "debit", "type": "withdrawal", "amount": 300.0}, {"id": "107_4", "studentId": "107", "date": "", "description": "", "type": "deposit", "amount": 320.0}, {"id": "107_5", "studentId": "107", "date": "", "description": "", "type": "withdrawal", "amount": 320.0}];
+
+// ============================================================
+// DATA LAYER (localStorage)
+// ============================================================
+const DB = {
+  getStudents: () => JSON.parse(localStorage.getItem('sbm_students') || 'null'),
+  saveStudents: (s) => localStorage.setItem('sbm_students', JSON.stringify(s)),
+  getTxns: () => JSON.parse(localStorage.getItem('sbm_txns') || 'null'),
+  saveTxns: (t) => localStorage.setItem('sbm_txns', JSON.stringify(t)),
+
+  students() {
+    let s = this.getStudents();
+    if (!s) { s = EXCEL_STUDENTS.map(x=>({...x})); this.saveStudents(s); }
+    return s;
+  },
+  txns() {
+    let t = this.getTxns();
+    if (!t) { t = EXCEL_TXNS.map(x=>({...x})); this.saveTxns(t); }
+    return t;
+  },
+
+  balance(studentId) {
+    const st = this.students().find(s => String(s.id) === String(studentId) || String(s.accountNumber) === String(studentId));
+    if (!st) return 0;
+    const txns = this.txns().filter(t => String(t.studentId) === String(st.id));
+    const dep = txns.filter(t=>t.type==='deposit').reduce((a,t)=>a+t.amount,0);
+    const wd = txns.filter(t=>t.type==='withdrawal').reduce((a,t)=>a+t.amount,0);
+    return (parseFloat(st.openingBalance)||0) + dep - wd;
+  },
+  deposits(studentId) {
+    const st = this.students().find(s => String(s.id) === String(studentId));
+    if (!st) return 0;
+    return (parseFloat(st.openingBalance)||0) + this.txns().filter(t=>String(t.studentId)===String(st.id)&&t.type==='deposit').reduce((a,t)=>a+t.amount,0);
+  },
+  withdrawals(studentId) {
+    const st = this.students().find(s => String(s.id) === String(studentId));
+    if (!st) return 0;
+    return this.txns().filter(t=>String(t.studentId)===String(st.id)&&t.type==='withdrawal').reduce((a,t)=>a+t.amount,0);
+  },
+
+  addStudent(s) { const arr = this.students(); arr.push(s); this.saveStudents(arr); },
+  addTxn(t) { const arr = this.txns(); arr.push(t); this.saveTxns(arr); },
+  deleteStudent(id) {
+    this.saveStudents(this.students().filter(s=>String(s.id)!==String(id)));
+    this.saveTxns(this.txns().filter(t=>String(t.studentId)!==String(id)));
+  }
+};
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function uid() { return Date.now().toString(36)+Math.random().toString(36).substr(2,8); }
+function fmt(n) { return '₹'+Number(n||0).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmtDate(d) {
+  if (!d || d==='null') return '';
+  try { const dt=new Date(d+'T00:00:00'); return dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); } catch { return d; }
+}
+function initials(name) {
+  if (!name) return '?';
+  const p=name.trim().split(/\s+/);
+  if(p.length>=2) return p[0][0].toUpperCase()+p[1][0].toUpperCase();
+  return p[0][0]?.toUpperCase()||'?';
+}
+function toast(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+let curView = 'dashboard';
+let viewStack = [];
+let curStudentId = null;
+const MAIN_VIEWS = ['dashboard','students','daily','reports','export'];
+
+function nav(view, sid=null, push=true) {
+  if (push && curView!==view) viewStack.push(curView);
+  curView = view;
+  if (sid) curStudentId = sid;
+
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const el = document.getElementById('view-'+view);
+  if (el) el.classList.add('active');
+
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  
+  const backBtn = document.getElementById('back-btn');
+  backBtn.classList.toggle('show', !MAIN_VIEWS.includes(view));
+
+  // Reset scroll
+  if (el) el.scrollTop = 0;
+
+  // View init
+  if (view==='dashboard') renderDash();
+  if (view==='students') renderStudents();
+  if (view==='student-detail') renderDetail();
+  if (view==='daily') { setToday(); }
+  if (view==='reports') renderReports();
+  if (view==='search') { setTimeout(()=>document.getElementById('global-search')?.focus(),200); renderGlobalSearch(); }
+}
+
+function goBack() {
+  const prev = viewStack.pop() || 'dashboard';
+  nav(prev, null, false);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDash() {
+  const students = DB.students();
+  const txns = DB.txns();
+  
+  document.getElementById('hero-date').textContent = new Date().toLocaleDateString('mr-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  
+  const totalDep = txns.filter(t=>t.type==='deposit').reduce((a,t)=>a+t.amount,0)
+    + students.reduce((a,s)=>a+(parseFloat(s.openingBalance)||0),0);
+  const totalWd = txns.filter(t=>t.type==='withdrawal').reduce((a,t)=>a+t.amount,0);
+  const totalBal = totalDep - totalWd;
+  const txnDep = txns.filter(t=>t.type==='deposit').reduce((a,t)=>a+t.amount,0);
+  const txnWd = txns.filter(t=>t.type==='withdrawal').reduce((a,t)=>a+t.amount,0);
+
+  document.getElementById('hero-total').textContent = Number(totalBal).toLocaleString('en-IN');
+  document.getElementById('hero-sub').textContent = \`${students.length} विद्यार्थी · ${txns.length} व्यवहार\`;
+  document.getElementById('stat-students').textContent = students.length;
+  document.getElementById('stat-txns').textContent = txns.length;
+  document.getElementById('stat-dep').textContent = fmt(txnDep);
+  document.getElementById('stat-wd').textContent = fmt(txnWd);
+
+  const recent = [...txns].sort((a,b)=>new Date(b.date)-new Date(a.date)||0).slice(0,6);
+  const container = document.getElementById('recent-txns');
+  if (!recent.length) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">💳</div><div class="empty-title">कोणते व्यवहार नाहीत</div></div>';
+  } else {
+    container.innerHTML = recent.map(t=>txnHTML(t,true)).join('');
+  }
+}
+
+// ============================================================
+// STUDENTS LIST
+// ============================================================
+let classFilter = '';
+
+function renderStudents() {
+  const q = (document.getElementById('s-search')?.value||'').toLowerCase();
+  const students = DB.students();
+  const filtered = students.filter(s=>{
+    const mq = !q || s.name.toLowerCase().includes(q) || String(s.accountNumber).includes(q) || (s.class||'').toLowerCase().includes(q);
+    const mc = !classFilter || s.class === classFilter;
+    return mq && mc;
+  });
+
+  const container = document.getElementById('student-list');
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><div class="empty-title">विद्यार्थी सापडला नाही</div><div class="empty-sub">'+(students.length===0?'Excel मधून आयात करा किंवा नवीन विद्यार्थी जोडा':'वेगळा शोध करून पहा')+'</div></div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(s=>{
+    const bal = DB.balance(s.id);
+    const init = initials(s.name);
+    return `<div class="student-card" onclick="nav('student-detail','${s.id}')">
+      <div class="avatar">${init}</div>
+      <div class="s-info">
+        <div class="s-name">${s.name}</div>
+        <div class="s-meta">खाते: ${s.accountNumber} &nbsp;·&nbsp; ${s.class||'—'}</div>
+      </div>
+      <div class="s-bal">
+        <div class="s-bal-amt">${fmt(bal)}</div>
+        <div class="s-bal-lbl">शिल्लक</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleFilter() {
+  const row = document.getElementById('filter-row');
+  row.classList.toggle('show');
+  if (row.classList.contains('show')) {
+    const classes = [...new Set(DB.students().map(s=>s.class).filter(Boolean))].sort();
+    row.innerHTML = `<span class="chip ${!classFilter?'active':''}" onclick="setClassFilter('')">सर्व</span>`
+      + classes.map(c=>`<span class="chip ${classFilter===c?'active':''}" onclick="setClassFilter('${c}')">${c}</span>`).join('');
+  }
+}
+
+function setClassFilter(c) {
+  classFilter = c;
+  renderStudents();
+  const row = document.getElementById('filter-row');
+  const classes = [...new Set(DB.students().map(s=>s.class).filter(Boolean))].sort();
+  row.innerHTML = `<span class="chip ${!classFilter?'active':''}" onclick="setClassFilter('')">सर्व</span>`
+    + classes.map(cl=>`<span class="chip ${classFilter===cl?'active':''}" onclick="setClassFilter('${cl}')">${cl}</span>`).join('');
+}
+
+// ============================================================
+// GLOBAL SEARCH
+// ============================================================
+function renderGlobalSearch() {
+  const q = (document.getElementById('global-search')?.value||'').toLowerCase().trim();
+  const results = document.getElementById('global-results');
+  if (!q) { results.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">नाव टाइप करा</div></div>'; return; }
+  
+  const students = DB.students().filter(s=>
+    s.name.toLowerCase().includes(q) || String(s.accountNumber).includes(q) || (s.class||'').toLowerCase().includes(q)
+  ).slice(0,20);
+
+  if (!students.length) { results.innerHTML = '<div class="empty"><div class="empty-icon">🚫</div><div class="empty-title">सापडले नाही</div></div>'; return; }
+
+  results.innerHTML = students.map(s=>{
+    const bal = DB.balance(s.id);
+    return `<div class="student-card" onclick="nav('student-detail','${s.id}')">
+      <div class="avatar">${initials(s.name)}</div>
+      <div class="s-info"><div class="s-name">${s.name}</div><div class="s-meta">खाते: ${s.accountNumber} · ${s.class||'—'}</div></div>
+      <div class="s-bal"><div class="s-bal-amt">${fmt(bal)}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// ADD STUDENT
+// ============================================================
+function addStudent() {
+  const name = document.getElementById('new-name').value.trim();
+  const acc = document.getElementById('new-acc').value.trim();
+  const cls = document.getElementById('new-class').value.trim();
+  const roll = document.getElementById('new-roll').value.trim();
+  const bal = parseFloat(document.getElementById('new-bal').value)||0;
+
+  if (!name || !acc) { toast('नाव आणि खाते क्रमांक आवश्यक आहे','error'); return; }
+  if (DB.students().find(s=>String(s.accountNumber)===acc)) { toast('हा खाते क्रमांक आधीच अस्तित्वात आहे!','error'); return; }
+
+  const s = { id: uid(), accountNumber: acc, name, class: cls, rollNumber: roll, openingBalance: bal };
+  DB.addStudent(s);
+  ['new-name','new-acc','new-class','new-roll','new-bal'].forEach(id=>document.getElementById(id).value='');
+  toast('विद्यार्थी खाते तयार केले!','success');
+  curStudentId = s.id;
+  nav('student-detail', s.id);
+}
+
+// ============================================================
+// STUDENT DETAIL
+// ============================================================
+function renderDetail() {
+  const s = DB.students().find(x=>String(x.id)===String(curStudentId)||String(x.accountNumber)===String(curStudentId));
+  if (!s) { nav('students'); return; }
+  curStudentId = s.id;
+
+  document.getElementById('dh-name').textContent = s.name;
+  document.getElementById('dh-meta').textContent = `वर्ग ${s.class||'—'}`;
+  document.getElementById('dh-acct').textContent = `खाते क्र.: ${s.accountNumber}`;
+  document.getElementById('bc-dep').textContent = fmt(DB.deposits(s.id));
+  document.getElementById('bc-wd').textContent = fmt(DB.withdrawals(s.id));
+  document.getElementById('bc-bal').textContent = fmt(DB.balance(s.id));
+
+  // QR
+  const qrBox = document.getElementById('detail-qr');
+  qrBox.innerHTML = '';
+  try {
+    new QRCode(qrBox,{text:String(s.accountNumber),width:80,height:80,colorDark:'#0a1f44',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+  } catch(e) {
+    qrBox.innerHTML = `<div style="font-size:0.58rem;text-align:center;word-break:break-all;padding:4px;">${s.accountNumber}</div>`;
+  }
+
+  // Transactions
+  const txns = DB.txns().filter(t=>String(t.studentId)===String(s.id)).sort((a,b)=>new Date(b.date)-new Date(a.date)||0);
+  document.getElementById('txn-count').textContent = txns.length+' व्यवहार';
+  const list = document.getElementById('detail-txns');
+  if (!txns.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">💳</div><div class="empty-title">कोणते व्यवहार नाहीत</div></div>';
+  } else {
+    list.innerHTML = txns.map(t=>txnHTML(t,false)).join('');
+  }
+}
+
+function downloadQR() {
+  const canvas = document.querySelector('#detail-qr canvas');
+  const img = document.querySelector('#detail-qr img');
+  const s = DB.students().find(x=>String(x.id)===String(curStudentId));
+  if (!s) return;
+  let url = canvas ? canvas.toDataURL() : img?.src;
+  if (!url) return;
+  const a = document.createElement('a');
+  a.href = url; a.download = `QR_${s.accountNumber}_${s.name.replace(/\s+/g,'_')}.png`; a.click();
+}
+
+function confirmDelete() {
+  const s = DB.students().find(x=>String(x.id)===String(curStudentId));
+  if (!s) return;
+  if (confirm(`"${s.name}" चे खाते आणि सर्व व्यवहार कायमचे हटवायचे?`)) {
+    DB.deleteStudent(s.id);
+    toast('खाते हटवले');
+    nav('students');
+  }
+}
+
+// ============================================================
+// TRANSACTION MODAL
+// ============================================================
+let curTxnType = 'deposit';
+
+function openTxnModal(type) {
+  curTxnType = type;
+  setTxnType(type);
+  document.getElementById('txn-amt').value = '';
+  document.getElementById('txn-date').value = today();
+  document.getElementById('txn-desc').value = '';
+  document.getElementById('txn-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('txn-amt').focus(),100);
+}
+
+function closeTxnModal(e) {
+  if (e.target.id==='txn-modal') document.getElementById('txn-modal').classList.remove('show');
+}
+
+function setTxnType(type) {
+  curTxnType = type;
+  document.getElementById('tt-dep').classList.toggle('active',type==='deposit');
+  document.getElementById('tt-wd').classList.toggle('active',type==='withdrawal');
+  document.getElementById('modal-title').textContent = type==='deposit' ? '💰 जमा नोंदवा' : '💸 खर्च नोंदवा';
+}
+
+function saveTxn() {
+  const s = DB.students().find(x=>String(x.id)===String(curStudentId));
+  if (!s) return;
+  const amt = parseFloat(document.getElementById('txn-amt').value);
+  if (!amt || amt<=0) { toast('वैध रक्कम टाका','error'); return; }
+  if (curTxnType==='withdrawal') {
+    const bal = DB.balance(s.id);
+    if (amt>bal) { toast(`अपुरी शिल्लक! सध्या: ${fmt(bal)}`,'error'); return; }
+  }
+  const txn = {
+    id: uid(),
+    studentId: s.id,
+    date: document.getElementById('txn-date').value||today(),
+    description: document.getElementById('txn-desc').value.trim() || (curTxnType==='deposit'?'बचत जमा':'खर्च'),
+    type: curTxnType,
+    amount: amt
+  };
+  DB.addTxn(txn);
+  document.getElementById('txn-modal').classList.remove('show');
+  toast(`${curTxnType==='deposit'?'जमा':'खर्च'} ${fmt(amt)} नोंदवले!`,'success');
+  renderDetail();
+}
+
+// ============================================================
+// TXN HTML HELPER
+// ============================================================
+function txnHTML(t, showName) {
+  const isDep = t.type==='deposit';
+  const s = showName ? DB.students().find(x=>String(x.id)===String(t.studentId)) : null;
+  return `<div class="txn-item">
+    <div class="txn-dot ${t.type}">${isDep?'⬆️':'⬇️'}</div>
+    <div class="txn-details">
+      ${showName&&s ? `<div class="txn-name">${s.name}</div>` : ''}
+      <div class="txn-type">${t.type==='deposit'?'जमा':'खर्च'}</div>
+      <div class="txn-desc">${t.description||'—'}</div>
+      <div class="txn-date">${fmtDate(t.date)}</div>
+    </div>
+    <div class="txn-amt">
+      <div class="txn-amt-val ${t.type}">${isDep?'+':'-'}${fmt(t.amount)}</div>
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// DAILY LOG
+// ============================================================
+function setToday() {
+  document.getElementById('daily-date').value = today();
+  renderDaily();
+}
+
+function renderDaily() {
+  const date = document.getElementById('daily-date')?.value || today();
+  const txns = DB.txns().filter(t=>t.date===date).sort((a,b)=>0);
+  const dep = txns.filter(t=>t.type==='deposit').reduce((a,t)=>a+t.amount,0);
+  const wd = txns.filter(t=>t.type==='withdrawal').reduce((a,t)=>a+t.amount,0);
+  document.getElementById('dl-count').textContent = txns.length;
+  document.getElementById('dl-dep').textContent = fmt(dep);
+  document.getElementById('dl-wd').textContent = fmt(wd);
+  document.getElementById('dl-net').textContent = fmt(dep-wd);
+  const list = document.getElementById('daily-txns');
+  if (!txns.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">या दिवशी कोणते व्यवहार नाहीत</div></div>';
+  } else {
+    list.innerHTML = txns.map(t=>txnHTML(t,true)).join('');
+  }
+}
+
+// ============================================================
+// REPORTS
+// ============================================================
+function renderReports() {
+  const students = DB.students();
+  
+  // Top balance
+  const withBal = students.map(s=>({...s, bal:DB.balance(s.id)})).sort((a,b)=>b.bal-a.bal);
+  const ranks = ['gold','silver','bronze'];
+  function topHTML(arr, key) {
+    return arr.slice(0,10).map((s,i)=>
+      `<div class="top-item">
+        <div class="top-rank ${ranks[i]||''}">${i+1}</div>
+        <div class="top-name">${s.name}<br><span style="font-size:0.68rem;color:var(--text2)">${s.class||''}</span></div>
+        <div class="top-val">${fmt(s[key])}</div>
+      </div>`
+    ).join('');
+  }
+  document.getElementById('top-balance').innerHTML = topHTML(withBal,'bal');
+
+  const withDep = students.map(s=>({...s, dep:DB.deposits(s.id)})).sort((a,b)=>b.dep-a.dep);
+  document.getElementById('top-deposits').innerHTML = topHTML(withDep,'dep');
+
+  // Class summary
+  const classes = [...new Set(students.map(s=>s.class).filter(Boolean))].sort();
+  const classSummary = classes.map(c=>{
+    const ss = students.filter(s=>s.class===c);
+    const total = ss.reduce((a,s)=>a+DB.balance(s.id),0);
+    return {name:c, count:ss.length, total};
+  }).sort((a,b)=>b.total-a.total);
+  document.getElementById('class-summary').innerHTML = classSummary.map((c,i)=>
+    `<div class="top-item">
+      <div class="top-rank ${ranks[i]||''}">${i+1}</div>
+      <div class="top-name">${c.name}<br><span style="font-size:0.68rem;color:var(--text2)">${c.count} विद्यार्थी</span></div>
+      <div class="top-val">${fmt(c.total)}</div>
+    </div>`
+  ).join('');
+
+  // Zero balance
+  const zeroBal = withBal.filter(s=>s.bal<=0);
+  document.getElementById('zero-balance').innerHTML = zeroBal.length===0
+    ? '<div class="empty"><div class="empty-icon">✅</div><div class="empty-title">सर्व विद्यार्थ्यांकडे शिल्लक आहे!</div></div>'
+    : zeroBal.map(s=>`<div class="top-item"><div class="avatar" style="width:32px;height:32px;font-size:0.8rem;border-radius:8px;">${initials(s.name)}</div><div class="top-name">${s.name}<br><span style="font-size:0.68rem;color:var(--text2)">${s.class||''} · खाते ${s.accountNumber}</span></div><div class="top-val" style="color:var(--red)">${fmt(s.bal)}</div></div>`).join('');
+}
+
+// ============================================================
+// IMPORT
+// ============================================================
+let importRows = [];
+
+function handleImport(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const reader = new FileReader();
+  reader.onload = ev => {
+    let rows = [];
+    try {
+      if (ext==='csv') {
+        const text = ev.target.result;
+        const lines = text.trim().split('\n');
+        const headers = lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+        rows = lines.slice(1).filter(l=>l.trim()).map(line=>{
+          const vals = line.split(',').map(v=>v.trim().replace(/^"|"$/g,''));
+          const obj={}; headers.forEach((h,i)=>obj[h]=vals[i]||''); return obj;
+        });
+      } else {
+        const wb = XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+        rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+      }
+    } catch(err) { toast('फाइल वाचताना त्रुटी: '+err.message,'error'); return; }
+    if (!rows?.length) { toast('फाइलमध्ये डेटा नाही','error'); return; }
+    showImportPreview(rows);
+  };
+  if (ext==='csv') reader.readAsText(file); else reader.readAsArrayBuffer(file);
+  e.target.value='';
+}
+
+function normalizeRow(row) {
+  const keys = Object.keys(row).map(k=>k.toLowerCase().replace(/\s+/g,''));
+  const vals = Object.values(row);
+  const get = patterns => {
+    for (const p of patterns) { const i = keys.findIndex(k=>k.includes(p)); if(i!==-1) return String(vals[i]||'').trim(); }
+    return '';
+  };
+  return {
+    accountNumber: get(['account','acc','no','number','खाते']),
+    name: get(['name','student','नाव']),
+    class: get(['class','grade','वर्ग']),
+    rollNumber: get(['roll']),
+    openingBalance: parseFloat(get(['balance','amount','शिल्लक']))||0
+  };
+}
+
+function showImportPreview(rows) {
+  importRows = rows;
+  const norm = rows.slice(0,5).map(normalizeRow);
+  document.getElementById('import-preview').innerHTML = `
+    <div class="import-preview">
+      <div class="preview-hdr">📋 ${rows.length} विद्यार्थी सापडले</div>
+      <div class="preview-tbl"><table>
+        <thead><tr><th>खाते</th><th>नाव</th><th>वर्ग</th><th>शिल्लक</th></tr></thead>
+        <tbody>
+          ${norm.map(r=>`<tr><td>${r.accountNumber}</td><td>${r.name}</td><td>${r.class}</td><td>${fmt(r.openingBalance)}</td></tr>`).join('')}
+          ${rows.length>5?`<tr><td colspan="4" style="text-align:center;color:var(--text2)">... आणखी ${rows.length-5}</td></tr>`:''}
+        </tbody>
+      </table></div>
+    </div>
+    <div style="padding:0 14px 14px;">
+      <button class="btn-pri" onclick="confirmImport()">✅ ${rows.length} विद्यार्थी आयात करा</button>
+      <button class="btn-sec" onclick="cancelImport()">रद्द करा</button>
+    </div>`;
+}
+
+function confirmImport() {
+  if (!importRows.length) return;
+  let added=0, skipped=0;
+  importRows.forEach(row=>{
+    const r = normalizeRow(row);
+    if (!r.name && !r.accountNumber) return;
+    if (!r.accountNumber) r.accountNumber = uid().substr(-4).toUpperCase();
+    if (DB.students().find(s=>String(s.accountNumber)===r.accountNumber)) { skipped++; return; }
+    DB.addStudent({id:uid(),...r});
+    added++;
+  });
+  importRows=[];
+  document.getElementById('import-preview').innerHTML='';
+  toast(`${added} विद्यार्थी आयात केले${skipped?', '+skipped+' वगळले':''}`,'success');
+}
+
+function cancelImport() {
+  importRows=[]; document.getElementById('import-preview').innerHTML='';
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function exportFull() {
+  const students = DB.students();
+  const txns = DB.txns();
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Homepage format
+  const homeRows = [
+    ['खाते क्र','वर्ग','विद्यार्थ्याचे नाव','एकूण जमा','एकूण खर्च','शिल्लक']
+  ];
+  students.forEach(s=>{
+    homeRows.push([s.accountNumber, s.class||''‚ s.name, DB.deposits(s.id), DB.withdrawals(s.id), DB.balance(s.id)]);
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(homeRows), 'Homepage');
+
+  // Sheet 2: All Transactions
+  const txnRows = txns.sort((a,b)=>new Date(a.date)-new Date(b.date)).map(t=>{
+    const s = students.find(x=>String(x.id)===String(t.studentId));
+    return {'दिनांक':t.date, 'खाते क्र':s?.accountNumber||'', 'विद्यार्थ्याचे नाव':s?.name||'', 'वर्ग':s?.class||'', 'माहिती':t.description, 'जमा':t.type==='deposit'?t.amount:0, 'खर्च':t.type==='withdrawal'?t.amount:0};
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(txnRows.length?txnRows:[{'संदेश':'कोणते व्यवहार नाहीत'}]), 'Transactions');
+
+  // Sheet 3: Summary
+  const sumRows = [
+    {'आयटम':'एकूण विद्यार्थी','मूल्य':students.length},
+    {'आयटम':'एकूण जमा','मूल्य':DB.students().reduce((a,s)=>a+DB.deposits(s.id),0)},
+    {'आयटम':'एकूण खर्च','मूल्य':DB.students().reduce((a,s)=>a+DB.withdrawals(s.id),0)},
+    {'आयटम':'एकूण शिल्लक','मूल्य':DB.students().reduce((a,s)=>a+DB.balance(s.id),0)},
+    {'आयटम':'निर्यात दिनांक','मूल्य':new Date().toLocaleDateString('en-IN')},
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(sumRows), 'Summary');
+
+  XLSX.writeFile(wb, `ZPHS_StudentBank_${today()}.xlsx`);
+  toast('Excel अहवाल निर्यात केला!','success');
+}
+
+function exportHomepageFormat() {
+  const students = DB.students();
+  const rows = [
+    ['खाते क्र','वर्ग','विद्यार्थ्याचे नाव','एकूण जमा','एकूण खर्च','शिल्लक']
+  ];
+  students.forEach(s=>{
+    rows.push([s.accountNumber, s.class||''‚ s.name, DB.deposits(s.id), DB.withdrawals(s.id), DB.balance(s.id)]);
+  });
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Homepage');
+  XLSX.writeFile(wb, `Homepage_${today()}.xlsx`);
+  toast('Homepage Excel निर्यात केले!','success');
+}
+
+function downloadCSV(rows, filename) {
+  if (!rows.length) return;
+  const headers = Object.keys(rows[0]);
+  const csv = [headers.join(','), ...rows.map(r=>headers.map(h=>`"${String(r[h]||"").replace(/"/g,'\"')}""`).join(','))].join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportStudentCSV() {
+  const rows = DB.students().map(s=>({'खाते क्र':s.accountNumber,'विद्यार्थ्याचे नाव':s.name,'वर्ग':s.class||'','जमा':DB.deposits(s.id),'खर्च':DB.withdrawals(s.id),'शिल्लक':DB.balance(s.id)}));
+  downloadCSV(rows, `Students_${today()}.csv`);
+  toast('विद्यार्थी यादी निर्यात केली!','success');
+}
+
+function exportTodayCSV() {
+  const txns = DB.txns().filter(t=>t.date===today());
+  if (!txns.length) { toast('आज कोणते व्यवहार नाहीत'); return; }
+  const rows = txns.map(t=>{
+    const s = DB.students().find(x=>String(x.id)===String(t.studentId));
+    return {'दिनांक':t.date,'नाव':s?.name||'','खाते':s?.accountNumber||'','प्रकार':t.type==='deposit'?'जमा':'खर्च','रक्कम':t.amount,'विवरण':t.description||'',};
+  });
+  downloadCSV(rows, `Daily_${today()}.csv`);
+  toast('आजचे व्यवहार निर्यात केले!','success');
+}
+
+function exportAllTxnsCSV() {
+  const txns = DB.txns();
+  if (!txns.length) { toast('कोणते व्यवहार नाहीत'); return; }
+  const rows = txns.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(t=>{
+    const s = DB.students().find(x=>String(x.id)===String(t.studentId));
+    return {'दिनांक':t.date,'नाव':s?.name||'','वर्ग':s?.class||'','खाते':s?.accountNumber||'','प्रकार':t.type==='deposit'?'जमा':'खर्च','रक्कम':t.amount,'विवरण':t.description||'',};
+  });
+  downloadCSV(rows, `AllTransactions_${today()}.csv`);
+  toast('सर्व व्यवहार निर्यात केले!','success');
+}
+
+function confirmReset() {
+  if (confirm('⚠️ सर्व विद्यार्थी खाती आणि व्यवहार कायमचे हटवायचे?\n\nहे पूर्ववत होणार नाही!')) {
+    localStorage.removeItem('sbm_students'); localStorage.removeItem('sbm_txns');
+    toast('सर्व डेटा हटवला');
+    nav('dashboard');
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  // Seed from Excel if no local data
+  DB.students(); DB.txns();
+  renderDash();
+  setToday();
+
+  // Drag-drop on import
+  const zone = document.getElementById('import-zone');
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop',e=>{
+    e.preventDefault(); zone.classList.remove('drag');
+    const file=e.dataTransfer.files[0];
+    if (file) handleImport({target:{files:[file],value:''}});
+  });
+});
+</script>
+</body>
+</html>
